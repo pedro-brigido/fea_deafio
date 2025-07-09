@@ -1,0 +1,36 @@
+models:
+  - name: stg_adw__addresses
+    description: >
+      Staging model for the address data. Cleans and renames columns from the raw_adventure_works.address table.
+      This model standardizes data types and applies naming conventions for use in downstream transformations.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: staging
+      source_docs_url: https://dataedo.com/samples/html/AdventureWorks/doc/AdventureWorks_2/tables.html
+    tags:
+      - staging
+      - adventure_works
+      - geography
+
+    columns:
+      - name: pk_address
+        description: Primary key of the address record.
+
+      - name: fk_state_province
+        description: Foreign key referencing the state or province where the address is located.
+
+      - name: address_line1
+        description: First line of the street address.
+
+      - name: address_line2
+        description: Second line of the street address, if available.
+
+      - name: postal_code
+        description: ZIP or postal code for the address.
+
+      - name: city
+        description: Name of the city for the address.
+
+      - name: modified_date
+        description: The date and time when the address record was last updated in the source system.

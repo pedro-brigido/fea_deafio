@@ -1,0 +1,29 @@
+models:
+  - name: dim_credit_cards
+    description: >
+      Credit card dimension model that provides details about the credit cards used by customers 
+      in sales transactions. This dimension includes the credit card type and can be used for 
+      analyzing payment methods, customer preferences, and financial metrics in conjunction with 
+      sales fact tables.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: mart
+    tags:
+      - mart
+      - adventure_works
+      - finance
+      - credit_card
+      - dimension
+
+    columns:
+      - name: pk_credit_card
+        description: >
+          Primary key for the credit card. Unique identifier for each credit card used in transactions.
+        tests:
+          - not_null
+          - unique
+
+      - name: card_type
+        description: >
+          Type of credit card (e.g., Visa, MasterCard, Amex, Discover, etc.).

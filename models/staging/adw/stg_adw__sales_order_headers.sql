@@ -18,7 +18,15 @@ with
             , cast(freight as numeric(18, 2)) as freight
             , cast(totaldue as numeric(18, 2)) as total_due
             , cast(revisionnumber as int) as revision_number
-            , cast(status as int) as status
+            , case status
+                when 1 then 'In Process'
+                when 2 then 'Approved'
+                when 3 then 'Backordered'
+                when 4 then 'Rejected'
+                when 5 then 'Shipped'
+                when 6 then 'Cancelled'
+                else 'Unknown'
+            end as status
             , cast(modifieddate as date) as date_modified
         from {{ source('raw_adventure_works', 'salesorderheader') }}
     )

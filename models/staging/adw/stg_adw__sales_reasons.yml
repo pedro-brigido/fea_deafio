@@ -1,0 +1,34 @@
+models:
+  - name: stg_adw__sales_reasons
+    description: >
+      Staging model for sales reasons from the raw_adventure_works.salesreason table.
+      This model standardizes the sales reason data, which captures the motivations behind 
+      why a customer placed a sales order. Sales reasons are used for marketing analysis, 
+      sales attribution, and understanding customer behavior.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: staging
+      source_docs_url: https://dataedo.com/samples/html/AdventureWorks/doc/AdventureWorks_2/tables.html      
+    tags:
+      - staging
+      - adventure_works
+      - sales
+      - reason
+      - marketing
+
+    columns:
+      - name: pk_sales_reason
+        description: Unique identifier for the sales reason.
+
+      - name: sales_reason_name
+        description: Name of the sales reason (e.g., Advertisement, Price, Quality, Promotion, etc.).
+
+      - name: reason_type
+        description: >
+          Category grouping for the sales reason (e.g., Marketing Campaign, Other).
+          This groups reasons into broader types for easier analysis.
+
+      - name: modified_date
+        description: >
+          The date and time when the sales reason record was last updated in the source system.

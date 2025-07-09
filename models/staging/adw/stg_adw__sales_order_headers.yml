@@ -1,0 +1,85 @@
+models:
+  - name: stg_adw__sales_order_headers
+    description: >
+      Staging model for sales order header data from the raw_adventure_works.salesorderheader table.
+      This model contains one row per sales order, capturing customer, salesperson, billing, shipping,
+      and financial details for each order. It includes foreign keys to related entities such as 
+      customers, territories, credit cards, and shipping methods. The status field is decoded from 
+      integers to descriptive labels for clarity.
+    meta:
+      has_pii: true
+      owner: adventure_works
+      layer: staging
+      source_docs_url: https://dataedo.com/samples/html/AdventureWorks/doc/AdventureWorks_2/tables.html
+    tags:
+      - staging
+      - adventure_works
+      - sales
+      - order
+      - transaction
+
+    columns:
+      - name: pk_sales_order
+        description: Unique identifier for the sales order.
+
+      - name: fk_customer
+        description: Foreign key referencing the customer placing the order.
+
+      - name: fk_salesperson
+        description: Foreign key referencing the salesperson responsible for the order.
+
+      - name: fk_territory
+        description: Foreign key referencing the sales territory related to the order.
+
+      - name: fk_bill_to_address
+        description: Foreign key referencing the billing address for the order.
+
+      - name: fk_ship_to_address
+        description: Foreign key referencing the shipping address for the order.
+
+      - name: fk_ship_method
+        description: Foreign key referencing the shipping method used for the order.
+
+      - name: fk_credit_card
+        description: Foreign key referencing the credit card used for payment.
+
+      - name: fk_currency_rate
+        description: Foreign key referencing the currency exchange rate applied to the order.
+
+      - name: order_date
+        description: Date when the sales order was placed.
+
+      - name: due_date
+        description: Date by which the order is due for delivery.
+
+      - name: ship_date
+        description: Date when the order was shipped. Null if not yet shipped.
+
+      - name: subtotal
+        description: Total amount before taxes and freight charges.
+
+      - name: tax_amount
+        description: Total tax amount applied to the order.
+
+      - name: freight
+        description: Freight (shipping) charges applied to the order.
+
+      - name: total_due
+        description: Total amount due for the order, including subtotal, tax, and freight.
+
+      - name: revision_number
+        description: Incremental revision number for tracking updates to the sales order.
+
+      - name: status
+        description: >
+          Current status of the sales order. Values include:
+          - 'In Process'
+          - 'Approved'
+          - 'Backordered'
+          - 'Rejected'
+          - 'Shipped'
+          - 'Cancelled'
+          - 'Unknown' (if the status code is not recognized)
+
+      - name: date_modified
+        description: The date when the sales order record was last updated in the source system.

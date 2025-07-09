@@ -11,7 +11,6 @@ def calculate_metrics(df):
     df["YEAR_MONTH"] = pd.to_datetime(df["ORDER_DATE"]).dt.to_period("M").astype(str)
     return df
 
-# 📁 Sumário para análises
 def generate_summary(df):
     return df.groupby([
         "PRODUCT_NAME", "CARD_TYPE", "SALES_REASON_NAME", "ORDER_DATE",

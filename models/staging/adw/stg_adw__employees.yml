@@ -1,0 +1,61 @@
+models:
+  - name: stg_adw__employees
+    description: >
+      Staging model for employee data from the raw_adventure_works.employee table. 
+      This model standardizes field names, applies data type casting, and handles 
+      categorical values such as marital status and gender. 
+      It contains information about each employee including job title, hire date, 
+      employment status, and organizational hierarchy.
+    meta:
+      has_pii: true
+      owner: adventure_works
+      layer: staging
+      source_docs_url: https://dataedo.com/samples/html/AdventureWorks/doc/AdventureWorks_2/tables.html
+    tags:
+      - staging
+      - adventure_works
+      - hr
+      - employees
+
+    columns:
+      - name: pk_business_entity
+        description: Primary key for the employee, corresponding to the business entity ID.
+
+      - name: national_id_number
+        description: National identification number assigned to the employee. May be subject to privacy controls.
+
+      - name: login_id
+        description: Login ID for the employee used in the organization’s systems.
+
+      - name: job_tittle
+        description: Job title of the employee.
+
+      - name: birth_date
+        description: Birth date of the employee.
+
+      - name: marital_status
+        description: Marital status of the employee. Values are 'Single' or 'Married' based on the source encoding.
+
+      - name: gender
+        description: Gender of the employee. Values are 'Male' or 'Female' based on the source encoding.
+
+      - name: hire_date
+        description: The date the employee was hired.
+
+      - name: salaried_flag
+        description: Boolean flag indicating whether the employee is salaried (True) or paid hourly (False).
+
+      - name: vacation_hours
+        description: Number of vacation hours accrued by the employee.
+
+      - name: sick_leave_hours
+        description: Number of sick leave hours accrued by the employee.
+
+      - name: current_flag
+        description: Boolean flag indicating whether the employee is currently employed (True) or not (False).
+
+      - name: modified_date
+        description: The date when the employee record was last updated in the source system.
+
+      - name: organization_node
+        description: Organizational node path representing the hierarchy position of the employee within the company.

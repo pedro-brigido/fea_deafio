@@ -3,7 +3,7 @@ with
         select
             cast(creditcardid as int) pk_credit_card
             , cast(cardtype as string) card_type
-            , cast(cardnumber as int) card_number
+            , cast(cardnumber as string) as card_number
             , cast(expmonth as int) expiration_month
             , cast(expyear as int) expiration_year
             , cast(modifieddate as string) modified_date

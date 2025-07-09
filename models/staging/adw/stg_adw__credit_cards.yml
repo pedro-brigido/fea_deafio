@@ -1,0 +1,36 @@
+models:
+  - name: stg_adw__credit_cards
+    description: >
+      Staging model for credit card data from the raw_adventure_works.creditcard table.
+      This model applies standard naming conventions and data type casting.
+      It contains information about the different credit cards used by customers, 
+      including card type, number, and expiration details.
+    meta:
+      has_pii: true
+      owner: adventure_works
+      layer: staging
+      source_docs_url: https://dataedo.com/samples/html/AdventureWorks/doc/AdventureWorks_2/tables.html
+    tags:
+      - staging
+      - adventure_works
+      - finance
+
+    columns:
+      - name: pk_credit_card
+        description: Unique identifier for the credit card.
+
+      - name: card_type
+        description: The type of credit card (e.g., Visa, MasterCard, Amex).
+
+      - name: card_number
+        description: >
+          The credit card number. Note: In the real world, this would typically be masked or encrypted.
+
+      - name: expiration_month
+        description: Expiration month of the credit card (1 to 12).
+
+      - name: expiration_year
+        description: Expiration year of the credit card.
+
+      - name: modified_date
+        description: The date the credit card record was last updated in the source system.

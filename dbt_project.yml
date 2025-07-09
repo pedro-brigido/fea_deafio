@@ -1,0 +1,41 @@
+name: 'fea_desafio'
+version: '1.0.0'
+
+profile: 'fea_desafio'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "dbt_packages"
+
+models:
+  fea_desafio:
+    +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table
+      +tags:
+        - marts
+      adw:
+        +tags:
+          - adw
+    staging:
+      +schema: stg
+      +materialized: view
+      +tags:
+        - staging
+      adw:
+        +tags:
+          - adw
+
+seeds:
+  fea_desafio:
+    adw:
+      +tags:
+        - adw
+    +schema: seeds

@@ -13,7 +13,11 @@ def display_filters(df):
     state_filter = st.sidebar.multiselect("Estado", df["STATE_NAME"].unique())
     country_filter = st.sidebar.multiselect("País", df["COUNTRY_NAME"].unique())
 
+    return date_range, product_filter, card_type_filter, city_filter, state_filter, country_filter
+
+def apply_filters(df, date_range, product_filter, card_type_filter, city_filter, state_filter, country_filter):
     df_filtered = df.copy()
+    df_filtered["ORDER_DATE"] = pd.to_datetime(df_filtered["ORDER_DATE"])
     if len(date_range) == 2:
         df_filtered = df_filtered[
             (df_filtered["ORDER_DATE"] >= pd.to_datetime(date_range[0])) &

@@ -1,0 +1,52 @@
+models:
+  - name: dim_customers
+    description: >
+      Customer dimension model that consolidates customer information from both individual 
+      and store customers. This model integrates customer master data with person details 
+      for individuals and store details for business customers. It serves as a unified 
+      dimension for customer-related analysis in sales, marketing, and operational reporting.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: mart
+    tags:
+      - mart
+      - adventure_works
+      - sales
+      - customer
+      - dimension
+
+    columns:
+      - name: pk_customer
+        description: >
+          Primary key for the customer. Unique identifier for each customer, 
+          whether an individual or a store.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: fk_person
+        description: >
+          Foreign key referencing the person entity, if the customer is an individual.
+          Null if the customer is a store.
+        data_tests:
+          - relationships:
+              to: ref('stg_adw__people')
+              field: pk_business_entity
+
+      - name: fk_store
+        description: >
+          Foreign key referencing the store entity, if the customer is a business (store).
+          Null if the customer is an individual.
+        data_tests:
+          - relationships:
+              to: ref('stg_adw__stores')
+              field: pk_business_entity
+
+      - name: customer_full_name
+        description: >
+          Full name of the customer if the customer is an individual. Null if the customer is a store.
+
+      - name: store_name
+        description: >
+          Name of the store if the customer is a business. Null if the customer is an individual.

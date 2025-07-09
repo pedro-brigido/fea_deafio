@@ -1,17 +1,17 @@
 with
     stg_address as (
         select *
-        from {{ ref('stg_adw__address') }}
+        from {{ ref('stg_adw__addresses') }}
     )
 
     , stg_state_province as (
         select *
-        from {{ ref('stg_adw__state_province') }}
+        from {{ ref('stg_adw__state_provinces') }}
     )
 
     , stg_country_region as (
         select *
-        from {{ ref('stg_adw__country_region') }}
+        from {{ ref('stg_adw__country_regions') }}
     )
 
     , joined_tables as (

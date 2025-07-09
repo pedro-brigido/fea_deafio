@@ -1,0 +1,34 @@
+models:
+  - name: dim_dates
+    description: >
+      Date dimension model based on order dates from the sales data. 
+      This model provides breakdowns of dates into year, month, and day components 
+      to support time-based aggregations, reporting, and filtering in analytical models.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: mart
+    tags:
+      - mart
+      - adventure_works
+      - date
+      - time
+      - dimension
+
+    columns:
+      - name: order_date
+        description: >
+          The date when the sales order was placed. Acts as the primary key for this date dimension.
+        data_tests:
+          - not_null
+
+      - name: order_year
+        description: The year component of the order date (e.g., 2022).
+
+      - name: order_month
+        description: >
+          The textual representation of the month (e.g., 'jan', 'feb', ... 'dec') 
+          derived from the order date.
+
+      - name: order_day
+        description: The day of the month component (1 to 31) derived from the order date.

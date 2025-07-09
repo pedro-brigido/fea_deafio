@@ -1,0 +1,44 @@
+models:
+  - name: stg_adw__people
+    description: >
+      Staging model for person data from the raw_adventure_works.person table.
+      This model standardizes field names, handles data type casting, 
+      and creates a full_name field by combining first, middle, and last names. 
+      The person entity represents individuals who may be employees, customers, 
+      vendors, or other business contacts.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: staging
+      source_docs_url: https://dataedo.com/samples/html/AdventureWorks/doc/AdventureWorks_2/tables.html
+    tags:
+      - staging
+      - adventure_works
+      - people
+      - hr
+      - customer
+
+    columns:
+      - name: pk_business_entity
+        description: >
+          Primary key for the person, corresponding to the business entity ID. 
+          This links to other entities like customers, employees, and vendors.
+
+      - name: person_type
+        description: >
+          The type of person. Indicates the role or classification within the organization 
+          (e.g., Employee, Store Contact, Individual Customer, etc.).
+
+      - name: first_name
+        description: First name of the person.
+
+      - name: middle_name
+        description: Middle name of the person. Nullable.
+
+      - name: last_name
+        description: Last name of the person.
+
+      - name: full_name
+        description: >
+          Full name of the person constructed by concatenating first, middle, 
+          and last names. Missing names are replaced with an underscore (_) as a placeholder.

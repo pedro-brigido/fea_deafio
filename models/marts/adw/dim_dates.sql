@@ -1,16 +1,11 @@
 with 
     dates as (
         select *
-        from {{ ref('stg_dates') }}
+        from {{ ref('stg_adw__dates') }}
 )
-
 , transform as (
-
     select
-        -- primary key
         order_date
-
-        -- properties
         , extract(year from order_date) as order_year
         , case
             when extract(month from order_date) = 1 then 'jan'
@@ -27,9 +22,7 @@ with
             when extract(month from order_date) = 12 then 'dec'
         end as order_month
         , extract(day from order_date) as order_day
-
     from dates
-
 )
 
 select *

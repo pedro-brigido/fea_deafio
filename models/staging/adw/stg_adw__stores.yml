@@ -1,0 +1,26 @@
+models:
+  - name: stg_adw__stores
+    description: >
+      Staging model for store data from the raw_adventure_works.store table.
+      This model represents customer stores (business customers) that are linked to sales orders.
+      It standardizes naming and types, and connects store entities to the broader customer and sales models.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: staging
+      source_docs_url: https://dataedo.com/samples/html/AdventureWorks/doc/AdventureWorks_2/tables.html
+    tags:
+      - staging
+      - adventure_works
+      - sales
+      - store
+      - customer
+
+    columns:
+      - name: pk_business_entity
+        description: >
+          Primary key for the store entity, corresponding to the business entity ID.
+          This links to the customer and person tables.
+
+      - name: store_name
+        description: Name of the store or business customer.

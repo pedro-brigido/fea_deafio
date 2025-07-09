@@ -1,0 +1,21 @@
+models:
+  - name: stg_adw__dates
+    description: >
+      Staging model that extracts the order date from the raw sales orders data 
+      (raw_adventure_works.salesorderheader). 
+      This model serves as a base for building a date dimension or for supporting 
+      date-based reporting and transformations in downstream models.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: staging
+      source_docs_url: https://dataedo.com/samples/html/AdventureWorks/doc/AdventureWorks_2/tables.html
+    tags:
+      - staging
+      - adventure_works
+      - sales
+      - dates
+
+    columns:
+      - name: order_date
+        description: The date when the sales order was placed.

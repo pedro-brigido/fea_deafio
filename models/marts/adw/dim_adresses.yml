@@ -1,0 +1,49 @@
+models:
+  - name: dim_adresses
+    description: >
+      Address dimension model combining address details with corresponding state/province 
+      and country information. This model provides enriched geographic context for analysis, 
+      including full hierarchy from city to state/province to country.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: mart
+    tags:
+      - mart
+      - adventure_works
+      - geography
+      - address
+      - dimension
+
+    columns:
+      - name: pk_address
+        description: >
+          Primary key for the address. Unique identifier for each physical address.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: fk_state_province
+        description: >
+          Foreign key referencing the state or province associated with the address.
+        data_tests:
+          - relationships:
+              to: ref('stg_adw__state_provinces')
+              field: pk_state_province
+
+      - name: fk_country_region_code
+        description: >
+          Foreign key referencing the country or region associated with the address.
+        data_tests:
+          - relationships:
+              to: ref('stg_adw__country_regions')
+              field: pk_country_region_code
+
+      - name: country_name
+        description: Full name of the country or region associated with the address.
+
+      - name: state_name
+        description: Full name of the state or province associated with the address.
+
+      - name: city
+        description: Name of the city where the address is located.

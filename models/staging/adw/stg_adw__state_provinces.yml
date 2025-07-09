@@ -1,0 +1,44 @@
+models:
+  - name: stg_adw__state_provinces
+    description: >
+      Staging model for state and province data from the raw_adventure_works.stateprovince table.
+      This model standardizes naming and typing for states or provinces, 
+      including geographic codes, territory associations, and country-region relationships.
+      It serves as a key geographic reference for addresses, customers, and sales territories.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: staging
+      source_docs_url: https://dataedo.com/samples/html/AdventureWorks/doc/AdventureWorks_2/tables.html      
+    tags:
+      - staging
+      - adventure_works
+      - geography
+      - location
+
+    columns:
+      - name: pk_state_province
+        description: Unique identifier for the state or province.
+
+      - name: fk_country_region_code
+        description: >
+          Foreign key referencing the country or region the state/province belongs to.
+
+      - name: fk_territory_id
+        description: >
+          Foreign key referencing the sales territory associated with the state or province.
+
+      - name: state_province_code
+        description: >
+          Abbreviation or code for the state or province (e.g., 'CA' for California).
+
+      - name: is_only_state_province_flag
+        description: >
+          Indicates whether this is the only state or province for the country/region.
+          Values are typically 'True' or 'False' as a string in the source system.
+
+      - name: state_name
+        description: Full name of the state or province.
+
+      - name: modified_date
+        description: The date when the state or province record was last updated in the source system.

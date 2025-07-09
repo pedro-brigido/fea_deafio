@@ -1,12 +1,12 @@
 with
     stg_sales_order_header as (
         select *
-        from {{ ref('stg_adw__sales_order_header') }}
+        from {{ ref('stg_adw__sales_order_headers') }}
     )
 
     , stg_sales_order_detail as (
         select *
-        from {{ ref('stg_adw__sales_order_detail') }}
+        from {{ ref('stg_adw__sales_order_details') }}
     )
 
     , enriched_sales_order as (

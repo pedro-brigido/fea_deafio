@@ -1,0 +1,22 @@
+models:
+  - name: stg_adw__country_regions
+    description: >
+      Staging model for the country or region reference data. 
+      It renames and standardizes fields from the raw_adventure_works.countryregion source table. 
+      This model serves as a standardized lookup for countries or regions referenced in other tables.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: staging
+      source_docs_url: https://dataedo.com/samples/html/AdventureWorks/doc/AdventureWorks_2/tables.html
+    tags:
+      - staging
+      - adventure_works
+      - geography
+
+    columns:
+      - name: pk_country_region_code
+        description: Primary key for the country or region, represented by its code.
+
+      - name: country_name
+        description: Name of the country or region.

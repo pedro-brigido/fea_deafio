@@ -1,0 +1,33 @@
+models:
+  - name: stg_adw__sales_order_header_sales_reasons
+    description: >
+      Staging model for the relationship between sales orders and their associated sales reasons, 
+      from the raw_adventure_works.salesorderheadersalesreason table.
+      This is a bridge table that allows associating multiple sales reasons with a single sales order.
+      Each record represents one reason linked to one sales order, enabling many-to-many relationships
+      between sales orders and sales reasons.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: staging
+      source_docs_url: https://dataedo.com/samples/html/AdventureWorks/doc/AdventureWorks_2/tables.html
+    tags:
+      - staging
+      - adventure_works
+      - sales
+      - reason
+      - order
+
+    columns:
+      - name: pk_sales_order
+        description: >
+          Primary key referencing the sales order associated with the sales reason.
+          This links to the sales order header table.
+
+      - name: fk_sales_reason
+        description: >
+          Foreign key referencing the sales reason that applies to this sales order.
+          Each order can have multiple reasons associated with it.
+
+      - name: modified_date
+        description: The date and time when the record was last updated in the source system.

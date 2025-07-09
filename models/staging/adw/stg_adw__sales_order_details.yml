@@ -1,0 +1,42 @@
+models:
+  - name: stg_adw__sales_order_details
+    description: >
+      Staging model for sales order line item details from the raw_adventure_works.salesorderdetail table. 
+      This model standardizes column names, casts data types, and defines foreign keys to related tables 
+      like products, sales orders, and special offers. Each record represents an individual item in a sales order.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: staging
+      source_docs_url: https://dataedo.com/samples/html/AdventureWorks/doc/AdventureWorks_2/tables.html
+    tags:
+      - staging
+      - adventure_works
+      - sales
+      - order
+      - transaction
+
+    columns:
+      - name: pk_sales_order_detail
+        description: Unique identifier for the sales order line item.
+
+      - name: fk_sales_order
+        description: Foreign key referencing the sales order header.
+
+      - name: fk_product
+        description: Foreign key referencing the product being sold.
+
+      - name: fk_special_offer
+        description: Foreign key referencing the special offer applied to this line item, if any.
+
+      - name: order_quantity
+        description: Number of units of the product in this line item.
+
+      - name: unit_price
+        description: Price per unit for the product at the time of the order.
+
+      - name: unit_price_discount
+        description: Discount applied to the unit price, expressed as a decimal (e.g., 0.1 for 10% discount).
+
+      - name: modified_date
+        description: The date and time when the sales order detail record was last updated in the source system.

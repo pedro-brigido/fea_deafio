@@ -1,0 +1,48 @@
+models:
+  - name: stg_adw__products
+    description: >
+      Staging model for product data from the raw_adventure_works.product table.
+      This model standardizes column names, casts data types, and prepares 
+      product-related information for downstream consumption. It includes core product 
+      attributes such as name, pricing, and related subcategory and model references.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: staging
+      source_docs_url: https://dataedo.com/samples/html/AdventureWorks/doc/AdventureWorks_2/tables.html
+    tags:
+      - staging
+      - adventure_works
+      - product
+      - sales
+
+    columns:
+      - name: pk_product
+        description: Unique identifier for each product.
+
+      - name: fk_product_subcategory
+        description: Foreign key referencing the product subcategory. Null if not assigned to a subcategory.
+
+      - name: fk_product_model
+        description: Foreign key referencing the product model, which describes common features across similar products.
+
+      - name: standard_cost
+        description: Standard manufacturing cost of the product.
+
+      - name: list_price
+        description: Selling price of the product to customers.
+
+      - name: product_name
+        description: Descriptive name of the product.
+
+      - name: product_number
+        description: Unique identifier or SKU for the product used internally.
+
+      - name: sell_start_date
+        description: The date when the product became available for sale.
+
+      - name: sell_end_date
+        description: The date when the product was no longer available for sale. Null if still being sold.
+
+      - name: modified_date
+        description: The date and time when the product record was last updated in the source system.

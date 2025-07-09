@@ -1,7 +1,7 @@
 with
     stg_credit_card as (
         select *
-        from {{ ref('stg_adw__credit_card') }}
+        from {{ ref('stg_adw__credit_cards') }}
     )
 
 select

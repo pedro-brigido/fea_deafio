@@ -1,0 +1,33 @@
+models:
+  - name: stg_adw__customers
+    description: >
+      Staging model for customer data from the raw_adventure_works.customer table.
+      This model applies standard naming conventions and data type casting.
+      It contains information about individual customers or stores, with references
+      to related person, store, and territory entities.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: staging
+      source_docs_url: https://dataedo.com/samples/html/AdventureWorks/doc/AdventureWorks_2/tables.html
+    tags:
+      - staging
+      - adventure_works
+      - sales
+      - customer
+
+    columns:
+      - name: pk_customer
+        description: Unique identifier for the customer, which could represent either a person or a store.
+
+      - name: fk_person
+        description: Foreign key to the person table. Null if the customer is a store instead of an individual.
+
+      - name: fk_store
+        description: Foreign key to the store table. Null if the customer is an individual instead of a store.
+
+      - name: fk_territory
+        description: Foreign key to the sales territory associated with the customer.
+
+      - name: modified_date
+        description: The date when the customer record was last updated in the source system.

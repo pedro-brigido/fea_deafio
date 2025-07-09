@@ -3,3 +3,4 @@ pandas
 plotly
 python-dotenv
 snowflake-connector-python
+pyarrow<=19.0.0

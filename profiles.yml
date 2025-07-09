@@ -1,0 +1,15 @@
+fea_desafio:
+  target: "{{ env_var('DBT_DEFAULT_TARGET', 'dev') }}"
+  outputs:
+    dev:
+      type: snowflake
+      account: "{{ env_var('DEV_SNOWFLAKE_ACCOUNT','ejb52940.us-east-1') }}"
+      user: "{{ env_var('DEV_SNOWFLAKE_USER','PEDRO_BRIGIDO') }}"
+      password: "{{ env_var('DEV_SNOWFLAKE_PASSWORD','Asdqwe123ewq') }}"
+      role: "{{ env_var('DEV_SNOWFLAKE_ROLE','FEA_STUDENT') }}"
+      warehouse: "{{ env_var('DEV_SNOWFLAKE_WAREHOUSE','ACADEMY_WAREHOUSE') }}"
+      database: "{{ env_var('DEV_SNOWFLAKE_DATABASE','FEA24_11') }}"
+      schema: "{{ env_var('DEV_SNOWFLAKE_SCHEMA','CEA_PBRIGIDO') }}"
+      threads: 8
+      client_session_keep_alive: False
+

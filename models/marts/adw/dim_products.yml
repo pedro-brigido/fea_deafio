@@ -1,0 +1,27 @@
+models:
+  - name: dim_products
+    description: >
+      Product dimension model that provides descriptive details about products 
+      used in sales transactions. This model includes the product ID and product name, 
+      serving as a reference for sales analysis, product performance reporting, and inventory tracking.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: mart
+    tags:
+      - mart
+      - adventure_works
+      - product
+      - dimension
+      - sales
+
+    columns:
+      - name: pk_product
+        description: >
+          Primary key for the product. Unique identifier for each product in the catalog.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: product_name
+        description: Descriptive name of the product.

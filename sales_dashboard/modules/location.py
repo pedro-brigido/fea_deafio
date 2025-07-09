@@ -1,25 +1,86 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-from utils.visuals import *
-from utils.data_loader import *
+from utils.visuals import geocode_dataframe
+from utils.data_loader import load_data
 
 def display_location_analysis(df):
-    st.markdown("## 🌍 Análise Geográfica de Vendas")
-    st.caption("Visualize a distribuição de receita e volume por cidades, estados e países, e descubra onde estão os maiores mercados.")
+    st.markdown("## 🌍 Desempenho Geográfico de Vendas")
+    st.caption("Compreenda onde estão seus principais mercados e oportunidades de expansão.")
+    st.markdown("---")
 
-    # --- KPIs ---
-    revenue_by_city = df.groupby("CITY")["NET_TOTAL"].sum()
-    revenue_by_state = df.groupby("STATE_NAME")["NET_TOTAL"].sum()
-    revenue_by_country = df.groupby("COUNTRY_NAME")["NET_TOTAL"].sum()
+    # KPIs
+    by_city = df.groupby("CITY")["NET_TOTAL"].sum()
+    by_state = df.groupby("STATE_NAME")["NET_TOTAL"].sum()
+    by_country = df.groupby("COUNTRY_NAME")["NET_TOTAL"].sum()
 
     col1, col2, col3 = st.columns(3)
-    col1.metric("🏙️ Cidade com Maior Receita", revenue_by_city.idxmax(), f"${revenue_by_city.max():,.2f}")
-    col2.metric("🗺️ Estado com Maior Receita", revenue_by_state.idxmax(), f"${revenue_by_state.max():,.2f}")
-    col3.metric("🌐 País com Maior Receita", revenue_by_country.idxmax(), f"${revenue_by_country.max():,.2f}")
+    col1.metric("🏙️ Cidade com Maior Receita", by_city.idxmax(), f"R$ {by_city.max():,.2f}")
+    col2.metric("🗽️ Estado com Maior Receita", by_state.idxmax(), f"R$ {by_state.max():,.2f}")
+    col3.metric("🌐 País com Maior Receita", by_country.idxmax(), f"R$ {by_country.max():,.2f}")
 
-    # --- Mapa Interativo por País ---
-    st.markdown("### 🗺️ Receita por País")
+    st.markdown("---")
+    dim_map = {"Cidade": "CITY", "Estado": "STATE_NAME", "País": "COUNTRY_NAME"}
+    dim_label = st.selectbox("Selecione a dimensão geográfica:", list(dim_map.keys()))
+    dim = dim_map[dim_label]
+    print(dim)
+
+    st.subheader("🌍 Receita por Cidade no Globo")
+    df_map = df.groupby([dim]).agg({
+        "NET_TOTAL": "sum",
+        "PK_SALES_ORDER": "nunique",
+        "ORDER_QUANTITY": "sum"
+    }).reset_index().rename(columns={
+        "PK_SALES_ORDER": "Total Pedidos",
+        "ORDER_QUANTITY": "Qtd Vendida",
+        "NET_TOTAL": "Receita"
+    })
+
+    # Reading geolocation
+    df_geo = load_data("SELECT * FROM FEA24_11.CEA_PBRIGIDO_SEEDS.GEOLOCATIONS")
+    df_map_geo = df_map.merge(df_geo.drop_duplicates(subset=[dim]), how="inner", on=[dim])
+
+    # Plot map
+    fig_map = px.scatter_geo(
+        df_map_geo,
+        lat="LATITUDE", 
+        lon="LONGITUDE",
+        color="Receita",
+        size="Receita",
+        hover_name=dim,
+        projection="natural earth",
+        color_continuous_scale="Viridis",
+        title="🌍 Receita Global por Cidade",
+        size_max=40
+    )
+    fig_map.update_traces(marker=dict(line=dict(width=0.8, color="white"), sizemode='area'))
+    fig_map.update_layout(geo=dict(showland=True), height=600, margin=dict(l=0, r=0, t=50, b=20))
+    st.plotly_chart(fig_map, use_container_width=True)
+
+    st.subheader("💡 Produtos com Maior Ticket Médio por Região")
+    dim_map = {"Cidade": "CITY", "Estado": "STATE_NAME", "País": "COUNTRY_NAME"}
+    dim_label = st.selectbox("Selecione a dimensão geográfica:", list(dim_map.keys()), key="box_2")
+    dim = dim_map[dim_label]
+
+    ticket_df = df.groupby([dim, "PRODUCT_NAME"]).agg({
+        "NET_TOTAL": "sum",
+        "PK_SALES_ORDER": "nunique"
+    }).reset_index()
+    ticket_df["Ticket Médio"] = ticket_df["NET_TOTAL"] / ticket_df["PK_SALES_ORDER"]
+
+    top_tickets = ticket_df.sort_values("Ticket Médio", ascending=False).head(20)
+    fig_ticket = px.bar(
+        top_tickets.sort_values("Ticket Médio", ascending=True),
+        x="Ticket Médio", y="PRODUCT_NAME", color=dim,
+        orientation="h",
+        title=f"Top 20 Ticket Médio por Produto e {dim_label}"
+    )
+    fig_ticket.update_traces(texttemplate='R$ %{x:,.2f}', textposition="outside")
+    fig_ticket.update_layout(height=max(500, len(top_tickets)*30))
+    st.plotly_chart(fig_ticket, use_container_width=True)
+
+    st.markdown("---")
+
     df_map = df.groupby(["CITY", "STATE_NAME", "COUNTRY_NAME"]).agg({
         "NET_TOTAL": "sum",
         "PK_SALES_ORDER": "nunique",
@@ -29,47 +90,9 @@ def display_location_analysis(df):
         "ORDER_QUANTITY": "Qtd Vendida",
         "NET_TOTAL": "Receita"
     })
-    df_map["Local"] = df_map["CITY"] + ", " + df_map["STATE_NAME"] + ", " + df_map["COUNTRY_NAME"]
+    st.subheader("📍 Detalhamento por Localidade")
+    top_locs = df_map.sort_values("Receita", ascending=False).head(10).copy()
+    top_locs.insert(0, "Ranking", range(1, len(top_locs)+1))
+    st.dataframe(top_locs[["Ranking", "CITY", "STATE_NAME", "COUNTRY_NAME", "Receita", "Total Pedidos", "Qtd Vendida"]], use_container_width=True)
 
-    map_fig = px.scatter_geo(df_map, locationmode="country names",
-                             locations="COUNTRY_NAME", color="Receita",
-                             hover_name="Local", size="Receita",
-                             title="Receita por Localidade",
-                             custom_data=["CITY", "STATE_NAME", "COUNTRY_NAME"])
-    map_fig.update_traces(marker=dict(line=dict(width=0.5, color='DarkSlateGrey')))
-    st.plotly_chart(map_fig, use_container_width=True)
-
-    # --- Mapa Coroplético por Estado (EUA) ---
-    st.markdown("### 🗺️ Receita por Estado (EUA)")
-    df_state_map = df[df["COUNTRY_NAME"] == "United States"].groupby("STATE_NAME")["NET_TOTAL"].sum().reset_index()
-    fig_choro = px.choropleth(df_state_map, locations="STATE_NAME", locationmode="USA-states", color="NET_TOTAL",
-                               color_continuous_scale="Blues", scope="usa", title="Receita por Estado (EUA)")
-    st.plotly_chart(fig_choro, use_container_width=True)
-
-    # --- Tabela Top 5 Cidades ---
-    st.markdown("### 🧾 Top 5 Cidades por Receita")
-    top_cities = df_map.sort_values("Receita", ascending=False).head(5).copy()
-    top_cities.insert(0, "Ranking", range(1, 6))
-    st.dataframe(top_cities[["Ranking", "CITY", "STATE_NAME", "COUNTRY_NAME", "Receita", "Total Pedidos", "Qtd Vendida"]], use_container_width=True)
-
-    # --- Desempenho Regional Detalhado ---
-    st.markdown("### 📍 Desempenho Regional Detalhado")
-    location_perf = df.groupby(["CITY", "STATE_NAME", "COUNTRY_NAME"]).agg({
-        "PK_SALES_ORDER": "nunique",
-        "ORDER_QUANTITY": "sum",
-        "NET_TOTAL": "sum"
-    }).reset_index().rename(columns={
-        "PK_SALES_ORDER": "Pedidos",
-        "ORDER_QUANTITY": "Qtd Comprada",
-        "NET_TOTAL": "Total Receita"
-    })
-    st.dataframe(location_perf.sort_values("Total Receita", ascending=False), use_container_width=True)
-
-    # --- Produtos com Maior Ticket Médio por Local ---
-    st.markdown("### 🧮 Produtos com Maior Ticket Médio por Local")
-    geo = st.selectbox("Selecione a dimensão geográfica:", ["CITY", "STATE_NAME", "COUNTRY_NAME"])
-    ticket_geo = df.groupby([geo, "PRODUCT_NAME"])["NET_TOTAL"].sum() / df.groupby([geo, "PRODUCT_NAME"])["PK_SALES_ORDER"].nunique()
-    ticket_geo = ticket_geo.reset_index(name="Ticket Médio")
-    st.plotly_chart(px.bar(ticket_geo.sort_values("Ticket Médio", ascending=False).head(20),
-                           x="PRODUCT_NAME", y="Ticket Médio", color=geo,
-                           title="Ticket Médio por Produto e Região"), use_container_width=True)
+    st.download_button("⬇️ Baixar Dados Regionais", df_map.to_csv(index=False).encode("utf-8"), file_name="desempenho_regional.csv", mime="text/csv")

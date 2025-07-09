@@ -4,73 +4,127 @@ import pandas as pd
 from utils.visuals import *
 from utils.data_loader import *
 
-def display_clients_advanced(df):
-    st.markdown("## 🧍 Análise Avançada de Clientes")
-    st.caption("Explore o comportamento dos principais clientes, seus padrões de compra e impactos na receita.")
+def display_clients_advanced(df_filtered,df):
+    st.markdown("## 🧍 Clientes em Foco")
+    st.markdown("#### Descubra quem são os clientes estratégicos, seus hábitos e o que impulsiona suas decisões de compra.")
+    st.markdown("---")
 
     df_clients = df.copy()
+    df_clients["GROSS_TOTAL"] = df_clients["ORDER_QUANTITY"] * df_clients["UNIT_PRICE"]
+    df_clients["NET_TOTAL"] = df_clients["GROSS_TOTAL"] * (1 - df_clients["UNIT_PRICE_DISCOUNT"])
+    df_clients["LEAD_TIME_SHIPPING"] = pd.to_datetime(df_clients["SHIP_DATE"]) - pd.to_datetime(df_clients["ORDER_DATE"])
+    df_clients["ORDER_DELAYED"] = df_clients["SHIP_DATE"] > df_clients["DUE_DATE"]
+    df_clients["DISCOUNT_APPLIED"] = df_clients["UNIT_PRICE_DISCOUNT"] > 0
+    df_clients["YEAR_MONTH"] = pd.to_datetime(df_clients["ORDER_DATE"]).dt.to_period("M").astype(str)
 
-    # --- KPIs ---
-    client_total = df_clients.groupby("CUSTOMER_FULL_NAME")["NET_TOTAL"].sum()
+    client_total = df_filtered.groupby("CUSTOMER_FULL_NAME")["NET_TOTAL"].sum()
     top_10 = client_total.nlargest(10)
     top_1_name = top_10.idxmax()
     top_1_value = top_10.max()
-    top_10_pct = top_10.sum() / df_clients["NET_TOTAL"].sum() * 100
-    freq = df_clients["PK_SALES_ORDER"].nunique() / df_clients["CUSTOMER_FULL_NAME"].nunique()
+    top_10_pct = top_10.sum() / df_filtered["NET_TOTAL"].sum() * 100
+    freq = df_filtered["PK_SALES_ORDER"].nunique() / df_filtered["CUSTOMER_FULL_NAME"].nunique()
+    top_10_no_reset = top_10
+    top_10 = top_10.reset_index()
 
-    col1, col2, col3 = st.columns(3)
-    col1.metric("🏆 Cliente Top 1", top_1_name, f"${top_1_value:,.2f}")
-    col2.metric("💼 % dos Top 10", f"{top_10_pct:.2f}%")
-    col3.metric("📅 Freq. Média de Compra", f"{freq:.2f} pedidos/cliente")
+    col1, col2 = st.columns([4, 2])
+    with col1:
+        st.subheader("🏅 Top 10 Clientes por Receita")
+        fig_top_clients = px.bar(
+            top_10,
+            x="NET_TOTAL", y="CUSTOMER_FULL_NAME", orientation="h",
+            labels={"CUSTOMER_FULL_NAME": "Cliente", "NET_TOTAL": "Receita ($)"},
+            text="NET_TOTAL",
+        )
+        fig_top_clients.update_traces(texttemplate='$ %{text:,.2f}', 
+                                      textposition='inside', textfont=dict(color="black", family="Arial Black", size=13)
+        )
+        st.plotly_chart(fig_top_clients, use_container_width=True)
 
-    # --- Tabela Top 10 Clientes ---
-    recent = df_clients.groupby("CUSTOMER_FULL_NAME")["ORDER_DATE"].max()
-    count = df_clients.groupby("CUSTOMER_FULL_NAME")["PK_SALES_ORDER"].nunique()
+    with col2:
+        st.metric("🏆 Cliente com Maior Receita", top_1_name, f"R$ {top_1_value:,.2f}")
+        st.metric("💼 % Receita dos Top 10", f"{top_10_pct:.2f}%")
+        st.metric("📅 Freq. Média de Compra", f"{freq:.2f} pedidos/cliente")
+        st.metric("📈 Receita Total (Top 10)", f"$ {top_10['NET_TOTAL'].sum():,.2f}")
+        st.metric("👥 Total de Clientes", len(df_filtered["CUSTOMER_FULL_NAME"].unique()))
+
+    st.markdown("---")
+
+    st.subheader("🎯 Fatores que Influenciaram Compras")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("### Distribuição por Tipo de Cartão")
+        fig_card = px.bar(df_clients.groupby("CARD_TYPE").size().reset_index(name="count"), x="CARD_TYPE", 
+                          y="count",
+                          labels={"CARD_TYPE": "Tipo de Cartão", "count": "Quantidade de Pedidos"},
+                          text="count")
+        fig_card.update_traces(textposition="outside", textfont=dict(color="white", family="Arial Black", size=10))
+        st.plotly_chart(fig_card, use_container_width=True)
+
+    with col2:
+        st.markdown("### Destribuição por motivo de compra")
+        reason_counts = (
+            df_clients.fillna("unknown")
+            .groupby("SALES_REASON_NAME")
+            .size()
+            .reset_index(name="Ocorrências")
+            .sort_values("Ocorrências", ascending=False)
+        )
+        fig_reasons = px.bar(
+            reason_counts, x="SALES_REASON_NAME", y="Ocorrências",
+            labels={"SALES_REASON_NAME": "Motivo"}, text="Ocorrências",
+        )
+        fig_reasons.update_traces(textposition="outside", textfont=dict(color="white", family="Arial Black", size=10))
+        st.plotly_chart(fig_reasons, use_container_width=True)
+
+    st.markdown("---")
+
+    client_summary = df_clients.groupby("CUSTOMER_FULL_NAME").agg(
+        Receita=("NET_TOTAL", "sum"),
+        Pedidos=("PK_SALES_ORDER", "nunique"),
+        Quantidade_Comprada=("ORDER_QUANTITY", "sum"),
+        Ultima_Compra=("ORDER_DATE", "max")
+    )
+    client_summary["Ticket Médio"] = client_summary["Receita"] / client_summary["Pedidos"]
+    
+    st.subheader("📊 Distribuição de Clientes: Receita x Frequência")
+    bubble_data = client_summary.reset_index()
+    fig_bubble = px.scatter(
+        bubble_data,
+        x="Pedidos", y="Receita",
+        size="Quantidade_Comprada", color="Ticket Médio",
+        hover_name="CUSTOMER_FULL_NAME",
+        labels={"Pedidos": "Nº de Pedidos", "Receita": "Receita (R$)", "Quantidade_Comprada": "Qtd Comprada", "Ticket Médio": "Ticket Médio (R$)"},
+        title="Distribuição de Receita vs. Frequência de Compra"
+    )
+    fig_bubble.update_layout(
+        height=600,
+        xaxis=dict(title="Frequência de Compras (Pedidos)", gridcolor="lightgrey"),
+        yaxis=dict(title="Receita Total (R$)", gridcolor="lightgrey"),
+        legend_title="Ticket Médio (R$)",
+        margin=dict(l=40, r=40, t=60, b=40),
+        plot_bgcolor="white"
+    )
+    fig_bubble.update_traces(
+        marker=dict(opacity=0.7, line=dict(width=1, color="DarkSlateGrey"))
+    )
+    st.plotly_chart(fig_bubble, use_container_width=True)
+
+    st.subheader("🧾 Ranking dos Top 10 Clientes")
+    recent = df_filtered.groupby("CUSTOMER_FULL_NAME")["ORDER_DATE"].max()
+    count = df_filtered.groupby("CUSTOMER_FULL_NAME")["PK_SALES_ORDER"].nunique()
     ticket = client_total / count
+
     df_top = pd.DataFrame({
         "Valor Total Negociado": client_total,
         "Nº de Pedidos": count,
         "Ticket Médio": ticket,
         "Última Compra": recent
-    }).loc[top_10.index].sort_values(by="Valor Total Negociado", ascending=False)
+    }).loc[top_10_no_reset.index].sort_values(by="Valor Total Negociado", ascending=False)
     df_top.reset_index(inplace=True)
     df_top.index += 1
     df_top.insert(0, "Ranking", df_top.index)
 
-    st.markdown("### 🧾 Top 10 Clientes por Receita")
     st.dataframe(df_top, use_container_width=True)
-
-    # --- Análise Comportamental ---
-    st.markdown("### 👤 Análise de Cliente Específico")
-    selected_client = st.selectbox("📍 Selecione um cliente para análise", df_top["CUSTOMER_FULL_NAME"])
-    df_sel = df_clients[df_clients["CUSTOMER_FULL_NAME"] == selected_client]
-
-    col1, col2 = st.columns(2)
-    prod_fig = px.bar(df_sel.groupby("PRODUCT_NAME")["ORDER_QUANTITY"].sum().reset_index(),
-                      x="PRODUCT_NAME", y="ORDER_QUANTITY",
-                      title="Produtos Mais Comprados")
-    card_fig = px.pie(df_sel, names="CARD_TYPE", values="NET_TOTAL", title="Preferência de Cartão")
-    col1.plotly_chart(prod_fig, use_container_width=True)
-    col2.plotly_chart(card_fig, use_container_width=True)
-
-    reason_fig = px.bar(df_sel.groupby("SALES_REASON_NAME")["NET_TOTAL"].sum().reset_index(),
-                        x="SALES_REASON_NAME", y="NET_TOTAL",
-                        title="Motivos de Venda Mais Comuns")
-    st.plotly_chart(reason_fig, use_container_width=True)
-
-    # --- Visão Geral de Todos os Clientes ---
-    st.markdown("### 📊 Métricas Gerais por Cliente")
-    general = df_clients.groupby("CUSTOMER_FULL_NAME").agg({
-        "PK_SALES_ORDER": "nunique",
-        "ORDER_QUANTITY": "sum",
-        "NET_TOTAL": "sum"
-    }).rename(columns={
-        "PK_SALES_ORDER": "Pedidos",
-        "ORDER_QUANTITY": "Qtd Comprada",
-        "NET_TOTAL": "Total Negociado"
-    })
-    st.dataframe(general.sort_values("Total Negociado", ascending=False), use_container_width=True)
-
-    # --- Download da Tabela ---
-    st.download_button("⬇️ Baixar Métricas de Clientes", general.to_csv().encode("utf-8"),
-                      file_name="clientes_metricas.csv", mime="text/csv")
+    st.download_button("⬇️ Baixar Tabela", df_top.to_csv(index=False).encode("utf-8"), file_name="top10_clientes.csv", mime="text/csv")

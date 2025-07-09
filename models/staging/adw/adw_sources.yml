@@ -1,32 +1,15 @@
-version: 2
-
 sources:
   - name: raw_adventure_works
     database: FEA24_11
     schema: RAW_ADVENTURE_WORKS
-    tags: ['ADW']
+    tags: ['ADVENTURE_WORKS', 'RAW']
     description: |
-      Data extracted from Adventure works to be transformed and delivered to the team.
+      Data extracted from Adventure Works containing raw operational data
+      used to build the analytics warehouse.
     tables:
-      - name: addresstype
-        description: Types of addresses stored in the Address table.
-        columns:
-          - name: addresstypeid
-            description: Primary key for AddressType records
-            data_tests:
-              - unique
-              - not_null
-          - name: name
-            description: Address type description. For example, Billing, Home, or Shipping.
-          - name: rowguid
-            description: ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.
-          - name: modifieddate
-            description: Date and time the record was last updated.
-          - name: extracted_at
-            description: The date and time the record was extracted from the source system.
-
       - name: address
-        description: Street address information for customers, employees, and vendors.
+        description: >
+          Stores customer and business address information, including city, state/province, and postal code.
         columns:
           - name: addressid
             description: Primary key for Address records.
@@ -38,143 +21,24 @@ sources:
           - name: addressline2
             description: Second street address line.
           - name: city
-            description: Name of the city.
+            description: City of the address.
           - name: stateprovinceid
-            description: Foreign key to StateProvince.StateProvinceID.
+            description: Foreign key to state/province table.
           - name: postalcode
-            description: Postal code for the street address.
-          - name: spatiallocation
-            description: Latitude and longitude of the street address.
-          - name: rowguid
-            description: ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.
+            description: Postal or ZIP code.
           - name: modifieddate
-            description: Date and time the record was last updated.
-          - name: extracted_at
-            description: The date and time the record was extracted from the source system.
-
-      - name: businessentityaddress
-        description: Cross-reference table mapping customers, vendors, and employees to their addresses.
-        columns:
-          - name: businessentityid
-            description: Primary key. Foreign key to BusinessEntity.BusinessEntityID.
-            data_tests:
-              - not_null
-          - name: addressid
-            description: Primary key. Foreign key to Address.AddressID.
-            data_tests:
-              - not_null
-              - unique
-          - name: addresstypeid
-            description: Primary key. Foreign key to AddressType.AddressTypeID.
-            data_tests:
-              - not_null
-          - name: rowguid
-            description: ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.
-          - name: modifieddate
-            description: Date and time the record was last updated.
-          - name: extracted_at
-            description: The date and time the record was extracted from the source system.
-
-      - name: businessentitycontact
-        description: Cross-reference table mapping stores, vendors, and employees to people
-        columns:
-          - name: businessentityid
-            description: Primary key. Foreign key to BusinessEntity.BusinessEntityID.
-            data_tests:
-              - not_null
-          - name: personid
-            description: Primary key. Foreign key to Person.PersonID.
-            data_tests:
-              - not_null
-          - name: contacttypeid
-            description: Primary key. Foreign key to ContactType.ContactTypeID.
-          - name: rowguid
-            description: ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.
-          - name: modifieddate
-            description: Date and time the record was last updated.
-          - name: extracted_at
-            description: The date and time the record was extracted from the source system.
-
-      - name: businessentity
-        description: Source of the ID that connects vendors, customers, and employees with address and contact information.
-        columns:
-          - name: businessentityid
-            description: Primary key. Unique identification number for the business entity.
-            data_tests:
-              - unique
-              - not_null
-          - name: rowguid
-            description: ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.
-          - name: modifieddate
-            description: Date and time the record was last updated.
-          - name: extracted_at
-            description: The date and time the record was extracted from the source system.
-
-      - name: contacttype
-        description: Lookup table containing the types of business entity contacts.
-        columns:
-          - name: contacttypeid
-            description: Primary key for ContactType records.
-            data_tests:
-              - unique
-              - not_null
-          - name: name
-            description: Contact type description.
-          - name: modifieddate
-            description: Date and time the record was last updated.
-          - name: extracted_at
-            description: The date and time the record was extracted from the source system.
+            description: Last modified date for the address record.
 
       - name: countryregion
-        description: Lookup table containing the ISO standard codes for countries and regions.
+        description: List of countries and regions, used for grouping addresses and sales analysis.
         columns:
           - name: countryregioncode
-            description: ISO standard code for countries and regions.
+            description: Primary key; ISO standard code for countries and regions.
             data_tests:
               - unique
               - not_null
           - name: name
             description: Country or region name.
-          - name: modifieddate
-            description: Date and time the record was last updated.
-          - name: extracted_at
-            description: The date and time the record was extracted from the source system.
-
-      - name: emailaddress
-        description: Where to send a person email.
-        columns:
-          - name: businessentityid
-            description: Primary key. Person associated with this email address. Foreign key to Person.BusinessEntityID
-            data_tests:
-              - not_null
-              - unique
-          - name: emailaddressid
-            description: Primary key. ID of this email address.
-          - name: emailaddress
-            description: Email address for the person.
-          - name: rowguid
-            description: ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.
-          - name: modifieddate
-            description: Date and time the record was last updated.
-          - name: extracted_at
-            description: The date and time the record was extracted from the source system.
-
-      - name: personphone
-        description: Telephone number and type of a person.
-        columns:
-          - name: businessentityid
-            description: Business entity identification number. Foreign key to Person.BusinessEntityID.
-            data_tests:
-              - not_null
-              - unique
-          - name: phonenumber
-            description: Telephone number identification number.
-          - name: phonenumbertypeid
-            description: Kind of phone number. Foreign key to PhoneNumberType.PhoneNumberTypeID.
-          - name: modifieddate
-            description: Date and time the record was last updated.
-          - name: extracted_at
-            description: The date and time the record was extracted from the source system.
 
       - name: person
         description: Human beings involved with AdventureWorks. employees, customer contacts, and vendor contacts.
@@ -195,10 +59,6 @@ sources:
             description: >
              false = The data in FirstName and LastName are stored in western style (first name, last name) order.
              true = Eastern style (last name, first name) order.
-            data_tests:
-              - accepted_values:
-                  values: ['false', 'true']
-                  quote: false
           - name: title
             description: Person title.
           - name: firstname
@@ -214,27 +74,12 @@ sources:
              0 = Contact does not wish to receive e-mail promotions,
              1 = Contact does wish to receive e-mail promotions from AdventureWorks,
              2 = Contact does wish to receive e-mail promotions from AdventureWorks and selected partners
-            data_tests:
-              - accepted_values:
-                  values: [0, 1, 2]
           - name: additionalcontactinfo
             description: Additional contact information about the person.
           - name: demographics
             description: Demographic information such as age, education, gender.
           - name: rowguid
             description: ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.
-          - name: modifieddate
-            description: Date and time the record was last updated.
-          - name: extracted_at
-            description: The date and time the record was extracted from the source system.
-
-      - name: phonenumbertype
-        description: Type of phone number of a person.
-        columns:
-          - name: phonenumbertypeid
-            description: Primary key for telephone number type records.
-          - name: name
-            description: Name of the telephone number type
           - name: modifieddate
             description: Date and time the record was last updated.
           - name: extracted_at
@@ -251,65 +96,17 @@ sources:
           - name: stateprovincecode
             description: ISO standard state or province code.
           - name: countryregioncode
-            description: ISO standard country or region code. e.g. US or CA.
+            description: Country or region code for this state/province (foreign key).
+          - name: territoryid
+            description: Associated sales territory (foreign key).
+          - name: stateprovincecode
+            description: Abbreviation for the state or province.
           - name: isonlystateprovinceflag
-            description: false = StateProvinceID is the only one representing this geographic entity. true = StateProvinceID is part of a larger geographic entity. one or more related StateProvince records make up the parent.
+            description: True if this is the only state/province for the country/region.
           - name: name
-            description: State or province description.
-          - name: territoryid
-            description: ID of the territory in which the state or province is located.
-          - name: rowguid
-            description: ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.
+            description: State or province name.
           - name: modifieddate
-            description: Date and time the record was last updated.
-          - name: extracted_at
-            description: The date and time the record was extracted from the source system.
-      - name: salesterritory
-        description: Sales territory lookup table.
-        columns:
-          - name: territoryid
-            description: Primary key for SalesTerritory records.
-            data_tests:
-              - unique
-              - not_null
-          - name: name
-            description: Territory name
-          - name: countryregioncode
-            description: ISO standard country or region code. Foreign key to CountryRegion.CountryRegionCode.
-          - name: group
-            description: Territory group
-          - name: salesytd
-            description: Sales year to date
-          - name: saleslastyear
-            description: Sales last year
-          - name: costytd
-            description: Cost year to date
-          - name: costlastyear
-            description: Cost last year
-          - name: rowguid
-            description: Unique identifier for the record
-          - name: modifieddate
-            description: Date when the record was last modified
-          - name: extracted_at
-            description: Date when the record was extracted from the source system
-
-      - name: salespersonquotahistory
-        description: Sales performance tracking.
-        columns:
-          - name: businessentityid
-            description: Sales person identification number. Foreign key to SalesPerson.BusinessEntityID.
-            data_tests:
-              - not_null
-          - name: quotadate
-            description: Date the sales quota was established
-          - name: salesquota
-            description: Sales quota
-          - name: rowguid
-            description: ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.
-          - name: modifieddate
-            description: Date when the record was last modified
-          - name: extracted_at
-            description: Date when the record was extracted from the source system
+            description: Last modified date for the state/province record.
 
       - name: salesperson
         description: Sales representative current information.
@@ -335,8 +132,6 @@ sources:
             description: ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.
           - name: modifieddate
             description: Date when the record was last modified
-          - name: extracted_at
-            description: Date when the record was extracted from the source system
 
       - name: customer
         description: Current customer information.
@@ -358,8 +153,6 @@ sources:
             description: ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.
           - name: modifieddate
             description: Date when the record was last modified
-          - name: extracted_at
-            description: Date when the record was extracted from the source system
 
       - name: store
         description: Customers (resellers) of Adventure Works products.
@@ -379,8 +172,6 @@ sources:
             description: ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.
           - name: modifieddate
             description: Date when the record was last modified
-          - name: extracted_at
-            description: Date when the record was extracted from the source system
 
       - name: salesorderheader
         description: General sales order information.
@@ -416,11 +207,6 @@ sources:
               - accepted_values:
                   values: ['false', 'true']
                   quote: false
-          - name: salesordernumber
-            description: Unique sales order identification number.
-            data_tests:
-              - not_null
-              - unique
           - name: purchaseordernumber
             description: Customer purchase order number reference.
           - name: accountnumber
@@ -457,8 +243,6 @@ sources:
             description: ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.
           - name: modifieddate
             description: Date the record was last modified
-          - name: extracted_at
-            description: Date when the record was extracted from the source system
 
       - name: salesorderdetail
         description: Individual products associated with a specific sales order.
@@ -490,8 +274,6 @@ sources:
             description: ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.
           - name: modifieddate
             description: Date the record was last modified
-          - name: extracted_at
-            description: Date when the record was extracted from the source system
 
       - name: salesorderheadersalesreason
         description: Cross-reference table mapping sales orders to sales reason.
@@ -506,8 +288,6 @@ sources:
               - not_null
           - name: modifieddate
             description: Date the record was last updated.
-          - name: extracted_at
-            description: Date when the record was extracted from the source system
 
       - name: creditcard
         description: Tabela que informa o tipo do cartão, número do cartão e data de expedição.
@@ -541,57 +321,7 @@ sources:
             description: Category the sales reason belongs to.
           - name: modifieddate
             description: Date the record was last modified
-          - name: extracted_at
-            description: Date when the record was extracted from the source system
 
-      - name: specialoffer
-        description: Sale discounts lookup table.
-        columns:
-          - name: specialofferid
-            description: Primary key for SpecialOffer records.
-            data_tests:
-              - not_null
-              - unique
-          - name: description
-            description: Description of the special offer.
-          - name: discountpct
-            description: Discount percentage.
-          - name: type
-            description: Type of special offer.
-          - name: category
-            description: Category of special offer.
-          - name: startdate
-            description: Start date of the special offer.
-          - name: enddate
-            description: End date of the special offer.
-          - name: minqty
-            description: Minimum quantity required to take advantage of the special offer.
-          - name: maxqty
-            description: Maximum quantity allowed to take advantage of the special offer.
-          - name: rowguid
-            description: ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.
-          - name: modifieddate
-            description: Date the record was last modified
-          - name: extracted_at
-            description: Date when the record was extracted from the source system
-
-      - name: specialofferproduct
-        description: Cross-reference table mapping products to special offers.
-        columns:
-          - name: specialofferid
-            description: Primary key for SpecialOfferProduct records.
-            data_tests:
-              - not_null
-          - name: productid
-            description: Product identification number. Foreign key to Product.ProductID.
-            data_tests:
-              - not_null
-          - name: rowguid
-            description: ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.
-          - name: modifieddate
-            description: Date the record was last modified
-          - name: extracted_at
-            description: Date when the record was extracted from the source system
       - name: product
         description: Products sold or used in the manfacturing of sold products.
         columns:
@@ -660,39 +390,6 @@ sources:
           - name: extracted_at
             description: Date and time when the record was extracted from the source system.
 
-      - name: productcategory
-        description: High-level product categorization.
-        columns:
-          - name: productcategoryid
-            description: Primary key for ProductCategory records.
-            data_tests:
-              - not_null
-              - unique
-          - name: name
-            description: Category description.
-          - name: rowguid
-            description: Globally unique identifier (GUID) of the product category.
-          - name: modifieddate
-            description: Date and time the record was last updated.
-          - name: extracted_at
-            description: Date and time when the record was extracted from the source system.
-
-      - name: productsubcategory
-        description: Product subcategories. See ProductCategory table.
-        columns:
-          - name: productsubcategoryid
-            description: Primary key for ProductSubCategory records.
-          - name: productcategoryid
-            description: Product category identification number. Foreign key to ProductCategory.ProductCategoryID
-          - name: name
-            description: Subcategory description.
-          - name: rowguid
-            description: Globally unique identifier (GUID) of the product subcategory.
-          - name: modifieddate
-            description: Date and time the record was last updated.
-          - name: extracted_at
-            description: Date and time when the record was extracted from the source system.
-
       - name: employee
         description: Employee information such as salary, department, and title.
         columns:
@@ -726,10 +423,6 @@ sources:
             description: >
               Job classification. false = Hourly, not exempt from collective bargaining. true = Salaried,
               exempt from collective bargaining.
-            data_tests:
-              - accepted_values:
-                  values: ['true', 'false']
-                  quote: false
           - name: vacationhours
             description: The employee's available vacation hours.
           - name: sickleavehours

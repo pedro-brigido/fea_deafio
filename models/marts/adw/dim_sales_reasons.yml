@@ -1,0 +1,40 @@
+models:
+  - name: dim_sales_reasons
+    description: >
+      Sales reason dimension model that connects sales orders to the reasons 
+      associated with those orders. This model combines sales order IDs with 
+      descriptive reasons and their types, providing context for analyzing 
+      customer motivations, marketing effectiveness, and sales attribution.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: mart
+    tags:
+      - mart
+      - adventure_works
+      - sales
+      - sales_reason
+      - marketing
+      - dimension
+
+    columns:
+      - name: pk_sales_order
+        description: >
+          Primary key referencing the sales order. This allows joining the sales reason 
+          information directly with sales order-level fact tables.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_adw__sales_order_headers')
+              field: pk_sales_order
+
+      - name: sales_reason_name
+        description: >
+          Name of the reason associated with the sales order. This explains the 
+          motivation behind the purchase, such as 'Advertisement', 'Price', 'Quality', etc.
+          If no reason is found, defaults to 'Unknown'.
+
+      - name: reason_type
+        description: >
+          Category of the sales reason (e.g., 'Marketing Campaign', 'Other'). 
+          This groups reasons into higher-level classifications for aggregated analysis.

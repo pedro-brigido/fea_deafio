@@ -1,0 +1,131 @@
+models:
+  - name: fct_sales_orders
+    description: >
+      Fact table at the sales order line level, combining data from order headers and order details.
+      Each row represents an individual item within a sales order, capturing key financial metrics, 
+      quantities, pricing, and relationships to customers, products, salespeople, addresses, and dates.
+      This model supports detailed transactional analysis of sales performance.
+    meta:
+      has_pii: false
+      owner: adventure_works
+      layer: mart
+    tags:
+      - mart
+      - adventure_works
+      - sales
+      - fact
+      - transaction
+
+    columns:
+      - name: pk_sales_order
+        description: >
+          Primary key for the sales order. Combined with fk_product, it forms a composite key 
+          representing an individual line item in the order.
+        data_tests:
+          - not_null
+
+      - name: fk_customer
+        description: Foreign key referencing the customer who placed the order.
+        data_tests:
+          - relationships:
+              to: ref('dim_customers')
+              field: pk_customer
+
+      - name: fk_product
+        description: Foreign key referencing the product in this line item.
+        data_tests:
+          - relationships:
+              to: ref('dim_products')
+              field: pk_product
+
+      - name: fk_salesperson
+        description: Foreign key referencing the salesperson responsible for the order.
+        data_tests:
+          - relationships:
+              to: ref('dim_sales_people')
+              field: pk_business_entity
+
+      - name: fk_territory
+        description: Foreign key referencing the sales territory associated with the order.
+        data_tests:
+          - relationships:
+              to: ref('dim_sales_territories')
+              field: pk_sales_territory
+
+      - name: fk_bill_to_address
+        description: Foreign key referencing the billing address for the order.
+        data_tests:
+          - relationships:
+              to: ref('dim_addresses')
+              field: pk_address
+
+      - name: fk_ship_to_address
+        description: Foreign key referencing the shipping address for the order.
+        data_tests:
+          - relationships:
+              to: ref('dim_addresses')
+              field: pk_address
+
+      - name: fk_ship_method
+        description: Foreign key referencing the shipping method used for the order.
+        data_tests:
+          - relationships:
+              to: ref('dim_ship_methods')
+              field: pk_ship_method
+
+      - name: fk_credit_card
+        description: Foreign key referencing the credit card used for payment.
+        data_tests:
+          - relationships:
+              to: ref('dim_credit_cards')
+              field: pk_credit_card
+
+      - name: fk_currency_rate
+        description: Foreign key referencing the currency exchange rate applied to the order.
+        data_tests:
+          - relationships:
+              to: ref('dim_currency_rates')
+              field: pk_currency_rate
+
+      - name: order_date
+        description: Date when the sales order was placed.
+
+      - name: due_date
+        description: Date when the sales order was due to be fulfilled.
+
+      - name: ship_date
+        description: Date when the sales order was shipped (null if not shipped).
+
+      - name: subtotal
+        description: Total value of items in the order before tax and freight.
+
+      - name: tax_amount
+        description: Total tax applied to the order.
+
+      - name: freight
+        description: Shipping or freight charges applied to the order.
+
+      - name: total_due
+        description: Total amount due for the order including subtotal, tax, and freight.
+
+      - name: revision_number
+        description: Incremental revision number used to track updates to the sales order.
+
+      - name: status
+        description: >
+          Current status of the sales order. Possible values include:
+          - 'In Process'
+          - 'Approved'
+          - 'Backordered'
+          - 'Rejected'
+          - 'Shipped'
+          - 'Cancelled'
+
+      - name: order_quantity
+        description: Number of units ordered for this product in this line item.
+
+      - name: unit_price
+        description: Unit price for the product at the time of the order.
+
+      - name: unit_price_discount
+        description: Discount applied to the unit price (as a decimal, e.g., 0.1 for 10% discount).
