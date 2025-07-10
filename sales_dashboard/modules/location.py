@@ -15,9 +15,9 @@ def display_location_analysis(df):
     by_country = df.groupby("COUNTRY_NAME")["NET_TOTAL"].sum()
 
     col1, col2, col3 = st.columns(3)
-    col1.metric("🏙️ Cidade com Maior Receita", by_city.idxmax(), f"R$ {by_city.max():,.2f}")
-    col2.metric("🗽️ Estado com Maior Receita", by_state.idxmax(), f"R$ {by_state.max():,.2f}")
-    col3.metric("🌐 País com Maior Receita", by_country.idxmax(), f"R$ {by_country.max():,.2f}")
+    col1.metric("🏙️ Cidade com Maior Receita", by_city.idxmax(), f"$ {by_city.max():,.2f}")
+    col2.metric("🗽️ Estado com Maior Receita", by_state.idxmax(), f"$ {by_state.max():,.2f}")
+    col3.metric("🌐 País com Maior Receita", by_country.idxmax(), f"$ {by_country.max():,.2f}")
 
     st.markdown("---")
     dim_map = {"Cidade": "CITY", "Estado": "STATE_NAME", "País": "COUNTRY_NAME"}
@@ -49,7 +49,7 @@ def display_location_analysis(df):
         size="Receita",
         hover_name=dim,
         projection="natural earth",
-        color_continuous_scale="Viridis",
+        color_continuous_scale="Cividis",
         title="🌍 Receita Global por Cidade",
         size_max=40
     )
@@ -75,7 +75,7 @@ def display_location_analysis(df):
         orientation="h",
         title=f"Top 20 Ticket Médio por Produto e {dim_label}"
     )
-    fig_ticket.update_traces(texttemplate='R$ %{x:,.2f}', textposition="outside")
+    fig_ticket.update_traces(texttemplate='$ %{x:,.2f}', textposition="outside")
     fig_ticket.update_layout(height=max(500, len(top_tickets)*30))
     st.plotly_chart(fig_ticket, use_container_width=True)
 
@@ -90,9 +90,7 @@ def display_location_analysis(df):
         "ORDER_QUANTITY": "Qtd Vendida",
         "NET_TOTAL": "Receita"
     })
-    st.subheader("📍 Detalhamento por Localidade")
+    st.subheader("📍 Top 10 cidades por receita")
     top_locs = df_map.sort_values("Receita", ascending=False).head(10).copy()
     top_locs.insert(0, "Ranking", range(1, len(top_locs)+1))
     st.dataframe(top_locs[["Ranking", "CITY", "STATE_NAME", "COUNTRY_NAME", "Receita", "Total Pedidos", "Qtd Vendida"]], use_container_width=True)
-
-    st.download_button("⬇️ Baixar Dados Regionais", df_map.to_csv(index=False).encode("utf-8"), file_name="desempenho_regional.csv", mime="text/csv")

@@ -5,8 +5,7 @@ from utils.visuals import *
 from utils.data_loader import *
 
 def display_clients_advanced(df_filtered,df):
-    st.markdown("## 🧍 Clientes em Foco")
-    st.markdown("#### Descubra quem são os clientes estratégicos, seus hábitos e o que impulsiona suas decisões de compra.")
+    st.markdown("## 🧍 Detalhamento Clientes")
     st.markdown("---")
 
     df_clients = df.copy()
@@ -41,7 +40,7 @@ def display_clients_advanced(df_filtered,df):
         st.plotly_chart(fig_top_clients, use_container_width=True)
 
     with col2:
-        st.metric("🏆 Cliente com Maior Receita", top_1_name, f"R$ {top_1_value:,.2f}")
+        st.metric("🏆 Cliente com Maior Receita", top_1_name, f"$ {top_1_value:,.2f}")
         st.metric("💼 % Receita dos Top 10", f"{top_10_pct:.2f}%")
         st.metric("📅 Freq. Média de Compra", f"{freq:.2f} pedidos/cliente")
         st.metric("📈 Receita Total (Top 10)", f"$ {top_10['NET_TOTAL'].sum():,.2f}")
@@ -95,14 +94,14 @@ def display_clients_advanced(df_filtered,df):
         x="Pedidos", y="Receita",
         size="Quantidade_Comprada", color="Ticket Médio",
         hover_name="CUSTOMER_FULL_NAME",
-        labels={"Pedidos": "Nº de Pedidos", "Receita": "Receita (R$)", "Quantidade_Comprada": "Qtd Comprada", "Ticket Médio": "Ticket Médio (R$)"},
+        labels={"Pedidos": "Nº de Pedidos", "Receita": "Receita ($)", "Quantidade_Comprada": "Qtd Comprada", "Ticket Médio": "Ticket Médio ($)"},
         title="Distribuição de Receita vs. Frequência de Compra"
     )
     fig_bubble.update_layout(
         height=600,
         xaxis=dict(title="Frequência de Compras (Pedidos)", gridcolor="lightgrey"),
-        yaxis=dict(title="Receita Total (R$)", gridcolor="lightgrey"),
-        legend_title="Ticket Médio (R$)",
+        yaxis=dict(title="Receita Total ($)", gridcolor="lightgrey"),
+        legend_title="Ticket Médio ($)",
         margin=dict(l=40, r=40, t=60, b=40),
         plot_bgcolor="white"
     )
@@ -127,4 +126,3 @@ def display_clients_advanced(df_filtered,df):
     df_top.insert(0, "Ranking", df_top.index)
 
     st.dataframe(df_top, use_container_width=True)
-    st.download_button("⬇️ Baixar Tabela", df_top.to_csv(index=False).encode("utf-8"), file_name="top10_clientes.csv", mime="text/csv")

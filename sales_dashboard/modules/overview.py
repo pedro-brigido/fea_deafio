@@ -15,27 +15,39 @@ def display_kpis_general(df_filtered: pd.DataFrame, df: pd.DataFrame):
     col2.metric("📦 Itens Vendidos", total_qty)
     col3.metric("💰 Receita Bruta", f"${gross:,.2f}")
     col4.metric("🎯 Ticket Médio por Pedido", f"${avg_ticket_order:,.2f}")
-    col5.metric("🚚 Entrega Média", f"{df_filtered['LEAD_TIME_SHIPPING'].mean().days} dias", help="Dias entre pedido e entrega")
+    col5.metric("🚚 Tempo médio de entrega", f"{df_filtered['LEAD_TIME_SHIPPING'].mean().days} dias", help="Dias entre pedido e entrega")
 
 def display_general(df_filtered: pd.DataFrame):
     st.title("📊 Painel Geral de Vendas")
-    st.caption("Uma visão executiva da performance mensal de vendas e tendências ao longo do tempo.")
+    st.caption("Painel geral de performance mensal de vendas e tendências ao longo do período selecionado.")
+
+    metric_choice = st.radio(
+        "Métrica", ["Receita Líquida", "Receita Bruta"],
+        horizontal=True, help="Escolha qual métrica analisar"
+    )
+    metric_map = {
+        "Receita Líquida": ("NET_TOTAL", "Receita Líquida ($)"),
+        "Receita Bruta": ("GROSS_TOTAL", "Receita Bruta ($)")
+    }
+    metric_col, y_label = metric_map[metric_choice]
 
     df_time = df_filtered.groupby("YEAR_MONTH").agg(
         NET_TOTAL=("NET_TOTAL", "sum"),
+        GROSS_TOTAL=("GROSS_TOTAL", "sum"),
         ORDER_QUANTITY=("ORDER_QUANTITY", "sum"),
         PK_SALES_ORDER=("PK_SALES_ORDER", "nunique")
     ).reset_index().sort_values("YEAR_MONTH")
 
-    st.markdown("#### 🕒 Evolução Mensal")
+    st.markdown(f"#### 🕒 Evolução Mensal - {y_label}")
     fig_receita_mes = px.line(
         df_time,
         x="YEAR_MONTH",
-        y="NET_TOTAL",
-        markers=True,
-        title="📈 Receita Líquida Mensal",
-        labels={"YEAR_MONTH": "Mês", "NET_TOTAL": "R$"}
+        y=metric_col,
+         markers=True,
+        #  title="📈 Evolução Mensal",
+         labels={"YEAR_MONTH": "Mês", metric_col: y_label}
     )
+
     fig_receita_mes.update_traces(line=dict(width=3))
     st.plotly_chart(fig_receita_mes, use_container_width=True)
 
@@ -57,7 +69,8 @@ def display_general(df_filtered: pd.DataFrame):
         st.plotly_chart(fig_pedidos, use_container_width=True)
 
     st.divider()
-    st.markdown("#### 🔎 Destaques do Período")
+
+    st.markdown("#### 🔎 Destaques do Periodo")
 
     top_products = df_filtered.groupby("PRODUCT_NAME")["GROSS_TOTAL"].sum().nlargest(5).reset_index()
     top_clients = df_filtered.groupby("CUSTOMER_FULL_NAME")["GROSS_TOTAL"].sum().nlargest(5).reset_index()
@@ -67,14 +80,14 @@ def display_general(df_filtered: pd.DataFrame):
 
     with col1:
         st.markdown("**🏆 Produtos Mais Lucrativos**")
-        st.dataframe(top_products.rename(columns={"GROSS_TOTAL": "Receita"}), use_container_width=True, hide_index=True)
+        st.dataframe(top_products.rename(columns={"GROSS_TOTAL": "Receita", "PRODUCT_NAME": "Produto"}), use_container_width=True, hide_index=True)
 
     with col2:
         st.markdown("**👤 Clientes Mais Lucrativos**")
-        st.dataframe(top_clients.rename(columns={"GROSS_TOTAL": "Receita"}), use_container_width=True, hide_index=True)
+        st.dataframe(top_clients.rename(columns={"GROSS_TOTAL": "Receita", "CUSTOMER_FULL_NAME": "Cliente"}), use_container_width=True, hide_index=True)
 
     with col3:
         st.markdown("**🌍 Cidades com Maior Receita**")
-        st.dataframe(top_cities.rename(columns={"GROSS_TOTAL": "Receita"}), use_container_width=True, hide_index=True)
+        st.dataframe(top_cities.rename(columns={"GROSS_TOTAL": "Receita", "CITY": "Cidade"}), use_container_width=True, hide_index=True)
 
-    st.info("💡 Explore detalhes por produto, cliente e localização nas abas específicas para análises aprofundadas.")
+    st.info("💡 Explore detalhes por produto, cliente e localização nas suas respectivas abas específicas.")

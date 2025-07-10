@@ -9,6 +9,7 @@ def calculate_metrics(df):
     df["ORDER_DELAYED"] = df["SHIP_DATE"] > df["DUE_DATE"]
     df["DISCOUNT_APPLIED"] = df["UNIT_PRICE_DISCOUNT"] > 0
     df["YEAR_MONTH"] = pd.to_datetime(df["ORDER_DATE"]).dt.to_period("M").astype(str)
+    df["YEAR"] = pd.to_datetime(df["ORDER_DATE"]).dt.year
     return df
 
 def generate_summary(df):

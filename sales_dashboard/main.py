@@ -1,4 +1,5 @@
 import streamlit as st
+from datetime import datetime
 from utils.data_loader import load_data
 from utils.metrics import calculate_metrics, generate_summary
 from utils.filters import display_filters, apply_filters
@@ -7,21 +8,7 @@ from modules.products import display_products_advanced
 from modules.clients import display_clients_advanced
 from modules.location import display_location_analysis
 
-# --------------------------------------------------------------------
-# 🎛️ Configuração da Aplicação
-# --------------------------------------------------------------------
-st.set_page_config(layout="wide")
-st.title("📊 Performance de Vendas")
-st.caption("📦 Adventure Works")
-
-# --------------------------------------------------------------------
-# 📥 Carga de Dados com Controle de Sessão
-# --------------------------------------------------------------------
-if "df_combined" not in st.session_state:
-    st.session_state.df_combined = None
-
-with st.sidebar:
-    query = f"""
+QUERY = f"""
     SELECT
         fso.*,
         dp.PRODUCT_NAME,
@@ -39,28 +26,36 @@ with st.sidebar:
     LEFT JOIN FEA24_11.CEA_PBRIGIDO_MARTS.DIM_ADRESSES da ON fso.FK_SHIP_TO_ADDRESS = da.PK_ADDRESS
     """
 
-    st.header("🔧 Controles")
+st.set_page_config(layout="wide")
+st.title("📦 Adventure Works")
+st.caption("Performance de Vendas")
 
-    # Botão de carregamento inicial
-    if st.button("📥 Carregar Dados"):
-        with st.spinner("Carregando dados do Snowflake..."):
-            st.session_state.df_combined = load_data(query)
+if "df_combined" not in st.session_state:
+    st.session_state.df_combined = None
+
+with st.sidebar:
+
+    st.header("🔧 Controles")
 
     # Botão para forçar atualização (ignora cache)
     if st.button("🔄 Atualizar Dados"):
         with st.spinner("Atualizando dados..."):
             st.cache_data.clear()
-            st.session_state.df_combined = load_data(query)
+            st.session_state.df_combined = load_data(QUERY)
 
-# --------------------------------------------------------------------
-# 🧠 Processamento e Exibição do Dashboard
-# --------------------------------------------------------------------
+# Carregamento inicial dos dados
+st.session_state.df_combined = load_data(QUERY)
+
 if st.session_state.df_combined is not None:
+    st.sidebar.success(f"Dados carregados: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     df_raw = st.session_state.df_combined
     df = calculate_metrics(df_raw)
-    date_range, product_filter, card_type_filter, city_filter, state_filter, country_filter = display_filters(df)
-    df_filtered = apply_filters(df, date_range, product_filter, card_type_filter, city_filter, state_filter, country_filter)
-    df_raw_filtered = apply_filters(df_raw, date_range, product_filter, card_type_filter, city_filter, state_filter, country_filter)
+    (date_range, product_filter, card_type_filter, city_filter, state_filter, 
+     country_filter, reason_filter, status_filter) = display_filters(df)
+    df_filtered = apply_filters(df, date_range, product_filter, card_type_filter, city_filter, 
+                                state_filter, country_filter, reason_filter, status_filter)
+    df_raw_filtered = apply_filters(df_raw, date_range, product_filter, card_type_filter, city_filter, 
+                                    state_filter, country_filter, reason_filter, status_filter)
     df_summary = generate_summary(df_filtered)
 
     # Abas principais do dashboard

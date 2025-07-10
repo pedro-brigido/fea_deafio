@@ -12,10 +12,16 @@ def display_filters(df):
     city_filter = st.sidebar.multiselect("Cidade", df["CITY"].unique())
     state_filter = st.sidebar.multiselect("Estado", df["STATE_NAME"].unique())
     country_filter = st.sidebar.multiselect("País", df["COUNTRY_NAME"].unique())
+    reason_filter = st.sidebar.multiselect("Motivo de Venda", df["SALES_REASON_NAME"].unique())
+    status_filter = st.sidebar.multiselect("Status", df["STATUS"].unique())
 
-    return date_range, product_filter, card_type_filter, city_filter, state_filter, country_filter
+    return (
+        date_range, product_filter, card_type_filter, city_filter,
+        state_filter, country_filter, reason_filter, status_filter
+    )
 
-def apply_filters(df, date_range, product_filter, card_type_filter, city_filter, state_filter, country_filter):
+def apply_filters(df, date_range, product_filter, card_type_filter, city_filter, 
+                  state_filter, country_filter, reason_filter, status_filter):
     df_filtered = df.copy()
     df_filtered["ORDER_DATE"] = pd.to_datetime(df_filtered["ORDER_DATE"])
     if len(date_range) == 2:
@@ -33,5 +39,9 @@ def apply_filters(df, date_range, product_filter, card_type_filter, city_filter,
         df_filtered = df_filtered[df_filtered["STATE_NAME"].isin(state_filter)]
     if country_filter:
         df_filtered = df_filtered[df_filtered["COUNTRY_NAME"].isin(country_filter)]
+    if reason_filter:
+        df_filtered = df_filtered[df_filtered["SALES_REASON_NAME"].isin(reason_filter)]
+    if status_filter:
+        df_filtered = df_filtered[df_filtered["STATUS"].isin(status_filter)]
 
     return df_filtered
