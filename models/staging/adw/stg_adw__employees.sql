@@ -7,12 +7,12 @@ with
             , cast(jobtitle as string) as job_tittle
             , cast(birthdate as date) as birth_date
             , case
-                when maritalstatus = 'S' then 'Single'
-                when maritalstatus = 'M' then 'Married'
+                when maritalstatus = 'S' then 'Solteiro'
+                when maritalstatus = 'M' then 'Casado'
             end as marital_status
             , case
-                when gender = 'M' then 'Male'
-                when gender = 'F' then 'Female'
+                when gender = 'M' then 'Masculino'
+                when gender = 'F' then 'Feminino'
             end as gender
             , cast(hiredate as date) as hire_date
             , cast(salariedflag as boolean) as salaried_flag
