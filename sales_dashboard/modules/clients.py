@@ -14,7 +14,6 @@ def display_clients_advanced(df_filtered,df):
     df_clients["LEAD_TIME_SHIPPING"] = pd.to_datetime(df_clients["SHIP_DATE"]) - pd.to_datetime(df_clients["ORDER_DATE"])
     df_clients["ORDER_DELAYED"] = df_clients["SHIP_DATE"] > df_clients["DUE_DATE"]
     df_clients["DISCOUNT_APPLIED"] = df_clients["UNIT_PRICE_DISCOUNT"] > 0
-    df_clients["YEAR_MONTH"] = pd.to_datetime(df_clients["ORDER_DATE"]).dt.to_period("M").astype(str)
 
     client_total = df_filtered.groupby("CUSTOMER_FULL_NAME")["NET_TOTAL"].sum()
     top_10 = client_total.nlargest(10)

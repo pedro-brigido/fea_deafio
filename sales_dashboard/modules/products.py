@@ -1,6 +1,7 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
+import textwrap
 
 def display_products_advanced(df_filtered: pd.DataFrame, df: pd.DataFrame):
     st.markdown("## 🧾 Detalhamento de Produtos")
@@ -22,17 +23,51 @@ def display_products_advanced(df_filtered: pd.DataFrame, df: pd.DataFrame):
 
     # promo_df = df[df["SALES_REASON_NAME"] == "On Promotion"]
     promo_df = df[
-        df["SALES_REASON_NAME"].str.contains("Promotion", case=False, na=False)]
+        df["SALES_REASON_NAME"].str.contains("Promo", case=False, na=False)]
     promo_product = promo_df.groupby("PRODUCT_NAME")["ORDER_QUANTITY"].sum().sort_values(ascending=False).head(1)
 
-    col1, col2, col3, col4 = st.columns([2.2, 1.4,  2.2, 2.2])
-    col1.metric("💰 Produto com Maior Receita", top_revenue["PRODUCT_NAME"].values[0], f"$ {top_revenue['gross_revenue'].values[0]:,.2f}")
-    col2.metric("📦 Mais Vendido (Qtd)", top_qty["PRODUCT_NAME"].values[0], f"{top_qty['total_quantity_sold'].values[0]:,}")
-    col3.metric("🎯 Maior Ticket Médio", top_ticket["PRODUCT_NAME"].values[0], f"$ {top_ticket['avg_ticket_per_order'].values[0]:,.2f}")
+    st.markdown(
+        """
+        <style>
+        div[data-testid="stMetric"] > div > div:nth-child(1) {      /* label */
+            font-size: 1.6rem;
+            line-height: 2;
+        }
+        div[data-testid="stMetric"] > div > div:nth-child(2) {      /* valor */
+            font-size: 1.30rem;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+    abbr = lambda name: textwrap.shorten(name, width=22, placeholder="…")
+    col1, col2, col3, col4 = st.columns([2.2, 1.4, 2.2, 2.2])
+
+    col1.metric(
+        "💰 Produto com Maior Receita",
+        abbr(top_revenue["PRODUCT_NAME"].iat[0]),
+        f"$ {top_revenue['gross_revenue'].iat[0]:,.2f}",
+    )
+    col2.metric(
+        "📦 Mais Vendido (Qtd)",
+        abbr(top_qty["PRODUCT_NAME"].iat[0]),
+        f"{top_qty['total_quantity_sold'].iat[0]:,}",
+    )
+    col3.metric(
+        "🎯 Maior Ticket Médio",
+        abbr(top_ticket['PRODUCT_NAME'].iat[0]),
+        f"$ {top_ticket['avg_ticket_per_order'].iat[0]:,.2f}",
+    )
 
     promo_name = promo_product.index[0] if not promo_product.empty else "-"
     promo_qty = promo_product.values[0] if not promo_product.empty else 0
-    col4.metric("🎁 Destaque em Promoção", promo_name, f"{promo_qty:,}")
+    col4.metric(
+        "🎁 Destaque em Promoção",
+        abbr(promo_name),
+        f"{promo_qty:,}",
+    )
 
     st.divider()
     col1, col2 = st.columns(2)
@@ -98,7 +133,7 @@ def display_products_advanced(df_filtered: pd.DataFrame, df: pd.DataFrame):
             barmode="group", title="🎯 Vendas por Produto e Motivo de Venda",
             labels={"PRODUCT_NAME": "Produto", "ORDER_QUANTITY": "Quantidade", "SALES_REASON_NAME": "Motivo de Venda"}
         )
-        reason_fig.update_layout(height=400 + len(df_reason["PRODUCT_NAME"].unique()) * 30)
+        reason_fig.update_layout(height=600 + len(df_reason["PRODUCT_NAME"].unique()) * 30)
         st.plotly_chart(reason_fig, use_container_width=True)
 
     with tab2:

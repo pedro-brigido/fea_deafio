@@ -14,10 +14,11 @@ def display_location_analysis(df):
     by_state = df.groupby("STATE_NAME")["NET_TOTAL"].sum()
     by_country = df.groupby("COUNTRY_NAME")["NET_TOTAL"].sum()
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     col1.metric("🏙️ Cidade com Maior Receita", by_city.idxmax(), f"$ {by_city.max():,.2f}")
     col2.metric("🗽️ Estado com Maior Receita", by_state.idxmax(), f"$ {by_state.max():,.2f}")
     col3.metric("🌐 País com Maior Receita", by_country.idxmax(), f"$ {by_country.max():,.2f}")
+    col4.metric("% Top 10 cidades vs Total", f"{by_city.nlargest(10).sum() / by_city.sum():.1%}", "Top 10 Receita % do total")
 
     st.markdown("---")
     dim_map = {"Cidade": "CITY", "Estado": "STATE_NAME", "País": "COUNTRY_NAME"}
@@ -88,9 +89,10 @@ def display_location_analysis(df):
     }).reset_index().rename(columns={
         "PK_SALES_ORDER": "Total Pedidos",
         "ORDER_QUANTITY": "Qtd Vendida",
-        "NET_TOTAL": "Receita"
+        "NET_TOTAL": "Receita ($)"
     })
     st.subheader("📍 Top 10 cidades por receita")
-    top_locs = df_map.sort_values("Receita", ascending=False).head(10).copy()
+    top_locs = df_map.sort_values("Receita ($)", ascending=False).head(10).copy()
     top_locs.insert(0, "Ranking", range(1, len(top_locs)+1))
-    st.dataframe(top_locs[["Ranking", "CITY", "STATE_NAME", "COUNTRY_NAME", "Receita", "Total Pedidos", "Qtd Vendida"]], use_container_width=True)
+    top_locs.rename(columns={"CITY": "Cidade", "STATE_NAME": "Estado", "COUNTRY_NAME": "País"}, inplace=True)
+    st.dataframe(top_locs[["Ranking", "Cidade", "Estado", "País", "Receita ($)", "Total Pedidos", "Qtd Vendida"]], use_container_width=True)

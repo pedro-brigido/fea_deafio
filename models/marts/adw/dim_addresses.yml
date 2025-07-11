@@ -1,5 +1,5 @@
 models:
-  - name: dim_adresses
+  - name: dim_addresses
     description: >
       Address dimension model combining address details with corresponding state/province 
       and country information. This model provides enriched geographic context for analysis, 
