@@ -6,7 +6,7 @@ import snowflake.connector as sc
 
 load_dotenv()
 
-@st.cache_data(ttl="1h")
+@st.cache_data(ttl=3600)
 def load_data(query, schema="CEA_PBRIGIDO_MARTS", database="FEA24_11"):
     creds = {
         "account": os.getenv("DEV_SNOWFLAKE_ACCOUNT"),
