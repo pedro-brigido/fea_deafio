@@ -63,7 +63,7 @@ def display_clients_advanced(df_filtered,df):
         st.plotly_chart(fig_card, use_container_width=True)
 
     with col2:
-        st.markdown("### Destribuição por motivo de compra")
+        st.markdown("### Distribuição por motivo de compra")
         reason_counts = (
             df_clients.fillna("unknown")
             .groupby("SALES_REASON_NAME")
