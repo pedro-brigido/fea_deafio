@@ -19,3 +19,6 @@ models:
     columns:
       - name: order_date
         description: The date when the sales order was placed.
+        data_tests:
+          - not_null
+          - unique

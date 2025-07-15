@@ -1,7 +1,6 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-from utils.visuals import geocode_dataframe
 from utils.data_loader import load_data
 
 def display_location_analysis(df):
@@ -44,18 +43,38 @@ def display_location_analysis(df):
     # Plot map
     fig_map = px.scatter_geo(
         df_map_geo,
-        lat="LATITUDE", 
+        lat="LATITUDE",
         lon="LONGITUDE",
         color="Receita",
         size="Receita",
         hover_name=dim,
         projection="natural earth",
-        color_continuous_scale="Cividis",
+        color_continuous_scale="Cividis_r",
         title="🌍 Receita Global por Cidade",
-        size_max=40
+        size_max=35,
+        opacity=0.4
     )
-    fig_map.update_traces(marker=dict(line=dict(width=0.8, color="white"), sizemode='area'))
-    fig_map.update_layout(geo=dict(showland=True), height=600, margin=dict(l=0, r=0, t=50, b=20))
+
+    fig_map.update_traces(
+        marker=dict(line=dict(width=0.8, color="#0d1117"), sizemode="area")
+    )
+
+    fig_map.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="#0d1117",
+        plot_bgcolor="#0d1117",
+        geo=dict(
+            bgcolor="#0d1117",
+            landcolor="#1a1f2b",
+            showland=True,
+            showcountries=True,
+            countrycolor="#444",
+            coastlinecolor="#444",
+        ),
+        height=600,
+        margin=dict(l=0, r=0, t=60, b=20)
+    )
+
     st.plotly_chart(fig_map, use_container_width=True)
 
     st.subheader("💡 Produtos com Maior Ticket Médio por Região")
@@ -70,9 +89,10 @@ def display_location_analysis(df):
     ticket_df["Ticket Médio"] = ticket_df["NET_TOTAL"] / ticket_df["PK_SALES_ORDER"]
 
     top_tickets = ticket_df.sort_values("Ticket Médio", ascending=False).head(20)
+    top_tickets.rename(columns={"PRODUCT_NAME": "Produto"}, inplace=True)
     fig_ticket = px.bar(
         top_tickets.sort_values("Ticket Médio", ascending=True),
-        x="Ticket Médio", y="PRODUCT_NAME", color=dim,
+        x="Ticket Médio", y="Produto", color=dim,
         orientation="h",
         title=f"Top 20 Ticket Médio por Produto e {dim_label}"
     )

@@ -12,7 +12,7 @@ with
     , joined_sales_order_header_sales_reason as (
         select
             stg_sales_order_header_sales_reason.pk_sales_order
-            , coalesce(stg_sales_reason.sales_reason_name, 'Unknown') as sales_reason_name
+            , coalesce(stg_sales_reason.sales_reason_name, 'Desconhecido') as sales_reason_name
             , stg_sales_reason.reason_type
         from stg_sales_order_header_sales_reason
         left join stg_sales_reason

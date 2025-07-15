@@ -1,6 +1,7 @@
-streamlit
-pandas
-plotly
-python-dotenv
-snowflake-connector-python
+streamlit==1.43.1
+pandas==2.2.3
+plotly==6.0.0
+python-dotenv==1.0.1
+snowflake-connector-python==3.14.0
+snowflake-snowpark-python==1.29.0
 pyarrow<=19.0.0

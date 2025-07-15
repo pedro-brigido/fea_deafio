@@ -1,7 +1,6 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-from utils.visuals import *
 from utils.data_loader import *
 
 def display_clients_advanced(df_filtered,df):
@@ -28,7 +27,7 @@ def display_clients_advanced(df_filtered,df):
     with col1:
         st.subheader("🏅 Top 10 Clientes por Receita")
         fig_top_clients = px.bar(
-            top_10,
+            top_10.sort_values("NET_TOTAL", ascending=True),
             x="NET_TOTAL", y="CUSTOMER_FULL_NAME", orientation="h",
             labels={"CUSTOMER_FULL_NAME": "Cliente", "NET_TOTAL": "Receita ($)"},
             text="NET_TOTAL",
@@ -53,7 +52,7 @@ def display_clients_advanced(df_filtered,df):
 
     with col1:
         st.markdown("### Distribuição por Tipo de Cartão")
-        fig_card = px.bar(df_clients.groupby("CARD_TYPE").size().reset_index(name="count"), x="CARD_TYPE", 
+        fig_card = px.bar(df_clients.fillna({"CARD_TYPE": "Outro"}).groupby("CARD_TYPE").size().sort_values(ascending=False).reset_index(name="count"), x="CARD_TYPE", 
                           y="count",
                           labels={"CARD_TYPE": "Tipo de Cartão", "count": "Quantidade de Pedidos"},
                           text="count")
@@ -63,7 +62,7 @@ def display_clients_advanced(df_filtered,df):
     with col2:
         st.markdown("### Destribuição por motivo de compra")
         reason_counts = (
-            df_clients.fillna("unknown")
+            df_clients.dropna(subset=["SALES_REASON_NAME"])
             .groupby("SALES_REASON_NAME")
             .size()
             .reset_index(name="Ocorrências")
@@ -123,5 +122,6 @@ def display_clients_advanced(df_filtered,df):
     df_top.reset_index(inplace=True)
     df_top.index += 1
     df_top.insert(0, "Ranking", df_top.index)
+    df_top.rename(columns={"CUSTOMER_FULL_NAME": "Cliente"}, inplace=True)
 
     st.dataframe(df_top, use_container_width=True)
