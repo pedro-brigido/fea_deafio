@@ -4,7 +4,7 @@ from geopy.extra.rate_limiter import RateLimiter
 import numpy as np
 
 def geocode_dataframe(df):
-    """Geocode all locations in the dataframe"""
+    """Generate coordinates for all locations in the dataframe"""
     geolocator = Nominatim(user_agent="my_geocoder")
     geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
     
@@ -31,13 +31,13 @@ def geocode_dataframe(df):
         
         print(f"Processed: {location}")
     
-    # Map coordinates back to dataframe
+
     for idx, row in df.iterrows():
         lat, lon = location_coords[row['location_string']]
         df.at[idx, 'latitude'] = lat
         df.at[idx, 'longitude'] = lon
     
-    # Clean up
+
     df.drop('location_string', axis=1, inplace=True)
     
     return df

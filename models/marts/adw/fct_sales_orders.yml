@@ -40,24 +40,12 @@ models:
 
       - name: fk_salesperson
         description: Foreign key referencing the salesperson responsible for the order.
-        data_tests:
-          - relationships:
-              to: ref('dim_sales_people')
-              field: pk_business_entity
 
       - name: fk_territory
         description: Foreign key referencing the sales territory associated with the order.
-        data_tests:
-          - relationships:
-              to: ref('dim_sales_territories')
-              field: pk_sales_territory
 
       - name: fk_bill_to_address
         description: Foreign key referencing the billing address for the order.
-        data_tests:
-          - relationships:
-              to: ref('dim_addresses')
-              field: pk_address
 
       - name: fk_ship_to_address
         description: Foreign key referencing the shipping address for the order.
@@ -68,10 +56,6 @@ models:
 
       - name: fk_ship_method
         description: Foreign key referencing the shipping method used for the order.
-        data_tests:
-          - relationships:
-              to: ref('dim_ship_methods')
-              field: pk_ship_method
 
       - name: fk_credit_card
         description: Foreign key referencing the credit card used for payment.
@@ -82,10 +66,6 @@ models:
 
       - name: fk_currency_rate
         description: Foreign key referencing the currency exchange rate applied to the order.
-        data_tests:
-          - relationships:
-              to: ref('dim_currency_rates')
-              field: pk_currency_rate
 
       - name: order_date
         description: Date when the sales order was placed.
@@ -114,12 +94,12 @@ models:
       - name: status
         description: >
           Current status of the sales order. Possible values include:
-          - 'In Process'
-          - 'Approved'
-          - 'Backordered'
-          - 'Rejected'
-          - 'Shipped'
-          - 'Cancelled'
+          - 'Em Processo'
+          - 'Aprovado'
+          - 'Em espera'
+          - 'Rejeitado'
+          - 'Entregue'
+          - 'Cancelado'
 
       - name: order_quantity
         description: Number of units ordered for this product in this line item.

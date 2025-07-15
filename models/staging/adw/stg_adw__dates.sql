@@ -4,6 +4,7 @@ with source as (
 )
 , dates as (
     select
+        distinct
         cast(orderdate as datetime) as order_date
     from source
 )

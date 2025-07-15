@@ -35,7 +35,6 @@ models:
 
 seeds:
   fea_desafio:
-    adw:
-      +tags:
-        - adw
+    +tags:
+      - adw
     +schema: seeds
