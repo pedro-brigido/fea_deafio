@@ -15,7 +15,7 @@ def display_kpis_general(df_filtered: pd.DataFrame, df: pd.DataFrame):
     col2.metric("📦 Itens Vendidos", total_qty)
     col3.metric("💰 Receita Bruta", f"${gross:,.2f}")
     col4.metric("🎯 Ticket Médio por Pedido", f"${avg_ticket_order:,.2f}")
-    col5.metric("🚚 Tempo médio de entrega", f"{df_filtered['LEAD_TIME_SHIPPING'].mean().days} dias", help="Dias entre pedido e entrega")
+    col5.metric("🚚 Tempo médio de entrega", f"{int(df_filtered['LEAD_TIME_SHIPPING'].mean())} dias", help="Dias entre pedido e entrega")
 
 def display_general(df_filtered: pd.DataFrame):
     st.title("📊 Painel Geral de Vendas")
