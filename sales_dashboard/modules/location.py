@@ -23,7 +23,6 @@ def display_location_analysis(df):
     dim_map = {"Cidade": "CITY", "Estado": "STATE_NAME", "País": "COUNTRY_NAME"}
     dim_label = st.selectbox("Selecione a dimensão geográfica:", list(dim_map.keys()))
     dim = dim_map[dim_label]
-    print(dim)
 
     st.subheader("🌍 Receita por Cidade no Globo")
     df_map = df.groupby([dim]).agg({
