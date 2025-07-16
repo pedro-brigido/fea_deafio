@@ -9,16 +9,6 @@ with
         from {{ ref('stg_adw__people') }}
     )
 
-    , stg_employee as (
-        select *
-        from {{ ref('stg_adw__employees') }}
-    )
-
-    , stg_sales_people as (
-        select *
-        from {{ ref('stg_adw__sales_people') }}
-    )
-
     , stg_stores as (
         select *
         from {{ ref('stg_adw__stores') }}

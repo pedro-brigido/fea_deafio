@@ -32,3 +32,6 @@ models:
 
       - name: order_day
         description: The day of the month component (1 to 31) derived from the order date.
+
+      - name: year_month
+        description: The year and month components of the order date (e.g., 'Jan2022').

@@ -25,7 +25,7 @@ def display_clients_advanced(df_filtered,df):
 
     col1, col2 = st.columns([4, 2])
     with col1:
-        st.subheader("🏅 Top 10 Clientes por Receita")
+        st.subheader("🏅 Top 10 Clientes por Receita Líquida")
         fig_top_clients = px.bar(
             top_10.sort_values("NET_TOTAL", ascending=True),
             x="NET_TOTAL", y="CUSTOMER_FULL_NAME", orientation="h",

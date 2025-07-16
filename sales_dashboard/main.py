@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import datetime
 from utils.data_loader import load_data
-from utils.metrics import calculate_metrics, generate_summary
+from sales_dashboard.utils.df_cleaning import dedup_and_cast_df
 from utils.filters import display_filters, apply_filters
 from modules.overview import display_kpis_general, display_general
 from modules.products import display_products_advanced
@@ -19,8 +19,6 @@ QUERY = f"""
         da.STATE_NAME, 
         da.COUNTRY_NAME,
         dd.ORDER_YEAR,
-        dd.ORDER_MONTH,
-        dd.ORDER_DAY,
         dd.YEAR_MONTH
     FROM FEA24_11.CEA_PBRIGIDO_MARTS.FCT_SALES_ORDERS fso
     LEFT JOIN FEA24_11.CEA_PBRIGIDO_MARTS.DIM_PRODUCTS dp ON fso.FK_PRODUCT = dp.PK_PRODUCT
@@ -54,14 +52,13 @@ st.session_state.df_combined = load_data(QUERY)
 if st.session_state.df_combined is not None:
     st.sidebar.success(f"Dados carregados: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     df_raw = st.session_state.df_combined
-    df = calculate_metrics(df_raw)
+    df = dedup_and_cast_df(df_raw)
     (date_range, product_filter, card_type_filter, city_filter, state_filter, 
      country_filter, reason_filter, status_filter) = display_filters(df)
     df_filtered = apply_filters(df, date_range, product_filter, card_type_filter, city_filter, 
                                 state_filter, country_filter, reason_filter, status_filter)
     df_raw_filtered = apply_filters(df_raw, date_range, product_filter, card_type_filter, city_filter, 
                                     state_filter, country_filter, reason_filter, status_filter)
-    df_summary = generate_summary(df_filtered)
 
     # Abas principais do dashboard
     tabs = st.tabs(["📈 Visão Geral", "📦 Produtos", "🧍 Clientes", "🌍 Localização"])
