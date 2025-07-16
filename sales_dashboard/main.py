@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import datetime
 from utils.data_loader import load_data
-from sales_dashboard.utils.df_cleaning import dedup_and_cast_df
+from utils.df_cleaning import dedup_and_cast_df
 from utils.filters import display_filters, apply_filters
 from modules.overview import display_kpis_general, display_general
 from modules.products import display_products_advanced
