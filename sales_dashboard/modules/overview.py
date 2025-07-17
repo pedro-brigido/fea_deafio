@@ -2,14 +2,14 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 
-def display_kpis_general(df_filtered: pd.DataFrame, df: pd.DataFrame):
+def display_kpis_general(df_filtered: pd.DataFrame):
     total_orders = df_filtered["PK_SALES_ORDER"].nunique()
     total_qty = df_filtered["ORDER_QUANTITY"].sum()
     gross = df_filtered["GROSS_TOTAL"].sum()
     net = df_filtered["NET_TOTAL"].sum()
     avg_ticket_order = net / total_orders if total_orders else 0
 
-    st.markdown("### 📌 Visão Consolidada", help="Indicadores gerais com base nos filtros selecionados")
+    st.markdown("### 📌 Indicadores gerais", help="Indicadores gerais com base nos filtros selecionados")
     col1, col2, col3, col4, col5 = st.columns(5)
     col1.metric("🧾 Pedidos", total_orders)
     col2.metric("📦 Itens Vendidos", total_qty)
@@ -18,8 +18,10 @@ def display_kpis_general(df_filtered: pd.DataFrame, df: pd.DataFrame):
     col5.metric("🚚 Tempo médio de entrega", f"{int(df_filtered['LEAD_TIME_SHIPPING'].mean())} dias", help="Dias entre pedido e entrega")
 
 def display_general(df_filtered: pd.DataFrame):
-    st.title("📊 Painel Geral de Vendas")
+    st.title("📈 Visão Geral de Vendas")
     st.caption("Painel geral de performance mensal de vendas e tendências ao longo do período selecionado.")
+
+    display_kpis_general(df_filtered)
 
     metric_choice = st.radio(
         "Métrica", ["Receita Líquida", "Receita Bruta"],
@@ -38,7 +40,7 @@ def display_general(df_filtered: pd.DataFrame):
         PK_SALES_ORDER=("PK_SALES_ORDER", "nunique")
     ).reset_index().sort_values("YEAR_MONTH")
 
-    st.markdown(f"#### 🕒 Evolução Mensal - {y_label}")
+    st.markdown(f"#### Evolução Mensal - {y_label}")
     fig_receita_mes = px.line(
         df_time,
         x="YEAR_MONTH",
@@ -55,7 +57,7 @@ def display_general(df_filtered: pd.DataFrame):
     with col1:
         fig_volume = px.bar(
             df_time, x="YEAR_MONTH", y="ORDER_QUANTITY",
-            title="📦 Quantidade Vendida por Mês",
+            title="Quantidade Vendida por Mês",
             labels={"ORDER_QUANTITY": "Qtd. Vendida", "YEAR_MONTH": "Mês"}
         )
         st.plotly_chart(fig_volume, use_container_width=True)
@@ -63,14 +65,14 @@ def display_general(df_filtered: pd.DataFrame):
     with col2:
         fig_pedidos = px.bar(
             df_time, x="YEAR_MONTH", y="PK_SALES_ORDER",
-            title="🧾 Total de Pedidos por Mês",
+            title="Total de Pedidos por Mês",
             labels={"PK_SALES_ORDER": "Pedidos", "YEAR_MONTH": "Mês"}
         )
         st.plotly_chart(fig_pedidos, use_container_width=True)
 
     st.divider()
 
-    st.markdown("#### 🔎 Destaques do Periodo")
+    st.markdown("#### Destaques do Periodo")
 
     top_products = df_filtered.groupby("PRODUCT_NAME")["GROSS_TOTAL"].sum().nlargest(5).reset_index()
     top_clients = df_filtered.groupby("CUSTOMER_FULL_NAME")["GROSS_TOTAL"].sum().nlargest(5).reset_index()
