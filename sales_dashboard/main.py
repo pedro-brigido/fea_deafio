@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import datetime
+from pytz import timezone
 from utils.data_loader import load_data
 from utils.df_cleaning import dedup_and_cast_df
 from utils.filters import display_filters, apply_filters
@@ -50,7 +51,7 @@ with st.sidebar:
 st.session_state.df_combined = load_data(QUERY)
 
 if st.session_state.df_combined is not None:
-    st.sidebar.success(f"Dados carregados: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    st.sidebar.success(f"Dados atualizados: {datetime.now(timezone('America/Sao_Paulo')).strftime('%Y-%m-%d %H:%M:%S')}")
     df_raw = st.session_state.df_combined
     df = dedup_and_cast_df(df_raw)
     (date_range, product_filter, card_type_filter, city_filter, state_filter, 
