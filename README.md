@@ -8,6 +8,16 @@ and fact tables.  The `sales_dashboard` folder exposes a web
 application that queries the warehouse using Snowflake credentials
 provided via environment variables.
 
+## Overview/Context
+
+Adventure Works (AW) is a fast‑growing bicycle manufacturer with 500+ products, 20 000 customers and 31 000 orders. To sustain this trajectory and beat the competition, AW’s leadership has launched a programme to become data‑driven by building a modern analytics platform.
+
+The initial milestone focuses on the Sales domain, but datasets from the ERP (SAP), CRM (Salesforce), Web Analytics (Google Analytics) and the Wordpress web store will soon follow. The initiative is championed by Innovation Director João Muller and backed by CEO Carlos Silveira, who demands iron‑clad data quality — for instance, 2011 gross sales must reconcile to US$ 12 646 112.16 as audited.
+
+Commercial Director Silvana Teixeira questions the ROI versus promotional spend, while IT Director Nilson Ramos must deliver with limited DBA bandwidth. The project therefore prioritises quick wins, automated quality tests and clear stakeholder communication to prove value early and often. Take a look at the dimensional model built on top of ADW dataset bellow:
+
+![Dimensional model for Adventure Works](resources/fea_dw.png)
+
 ## Repository structure
 
 ```
@@ -16,11 +26,8 @@ provided via environment variables.
 ├── resources/             # architecture diagram of the warehouse
 ├── sales_dashboard/       # Streamlit application
 ├── requirements.txt       # dependencies for dbt
-└── sales_dashboard/requirements.txt
+└── sales_dashboard/requirements.txt # dependencies for dash
 ```
-
-The folder `resources` contains `fea_dw.png` with a diagram of the
-warehouse design.
 
 ## Requirements
 
@@ -51,13 +58,11 @@ pip install -r sales_dashboard/requirements.txt
 
 ## Running dbt
 
-With the environment variables set, execute the following commands to
+With the environment variables set, execute the following command to
 build the warehouse:
 
 ```bash
-dbt seed      # load seed files
-(db) dbt run  # build models
-(db) dbt test # run tests defined in the project
+dbt build # test and build all models
 ```
 
 The generated schemas will be created under the database and schema
