@@ -85,7 +85,7 @@ def display_clients_advanced(df_filtered,df):
     )
     client_summary["Ticket Médio"] = client_summary["Receita"] / client_summary["Pedidos"]
     
-    st.subheader("📊 Distribuição de Clientes: Receita x Frequência")
+    st.subheader("Distribuição de Clientes: Receita x Frequência e Ticket Médio")
     bubble_data = client_summary.reset_index()
     fig_bubble = px.scatter(
         bubble_data,
@@ -93,7 +93,7 @@ def display_clients_advanced(df_filtered,df):
         size="Quantidade_Comprada", color="Ticket Médio",
         hover_name="CUSTOMER_FULL_NAME",
         labels={"Pedidos": "Nº de Pedidos", "Receita": "Receita ($)", "Quantidade_Comprada": "Qtd Comprada", "Ticket Médio": "Ticket Médio ($)"},
-        title="Distribuição de Receita vs. Frequência de Compra"
+        # title="Distribuição de Receita vs. Frequência de Compra"
     )
     fig_bubble.update_layout(
         height=600,
@@ -101,14 +101,14 @@ def display_clients_advanced(df_filtered,df):
         yaxis=dict(title="Receita Total ($)", gridcolor="lightgrey"),
         legend_title="Ticket Médio ($)",
         margin=dict(l=40, r=40, t=60, b=40),
-        plot_bgcolor="white"
+        plot_bgcolor="#222222"
     )
     fig_bubble.update_traces(
-        marker=dict(opacity=0.7, line=dict(width=1, color="DarkSlateGrey"))
+        marker=dict(opacity=0.6, line=dict(width=2, color="#027392"), sizeref=3.5, sizemode="area")
     )
     st.plotly_chart(fig_bubble, use_container_width=True)
 
-    st.subheader("🧾 Ranking dos Top 10 Clientes")
+    st.subheader("Ranking dos Top 10 Clientes")
     recent = df_filtered.groupby("CUSTOMER_FULL_NAME")["ORDER_DATE"].max()
     count = df_filtered.groupby("CUSTOMER_FULL_NAME")["PK_SALES_ORDER"].nunique()
     ticket = client_total / count

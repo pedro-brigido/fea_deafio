@@ -48,14 +48,14 @@ def display_location_analysis(df):
         size="Receita",
         hover_name=dim,
         projection="natural earth",
-        color_continuous_scale="Cividis_r",
+        color_continuous_scale="Tealrose",
         title="🌍 Receita Global por Cidade",
         size_max=35,
         opacity=0.4
     )
 
     fig_map.update_traces(
-        marker=dict(line=dict(width=0.8, color="#0d1117"), sizemode="area")
+        marker=dict(line=dict(width=0.8, color="#343434"), sizemode="area")
     )
 
     fig_map.update_layout(

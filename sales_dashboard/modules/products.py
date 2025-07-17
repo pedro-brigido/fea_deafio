@@ -4,7 +4,7 @@ import pandas as pd
 import textwrap
 
 def display_products_advanced(df_filtered: pd.DataFrame, df: pd.DataFrame):
-    st.markdown("## 🧾 Detalhamento de Produtos")
+    st.markdown("## 📦 Detalhamento de Produtos")
     st.caption("Explore o desempenho dos produtos, impacto das promoções e ticket médio por produto.")
 
     # KPIs
@@ -72,7 +72,7 @@ def display_products_advanced(df_filtered: pd.DataFrame, df: pd.DataFrame):
     st.divider()
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("### 🎯 Top 10 Produtos por Ticket Médio")
+        st.markdown("### Top 10 Produtos por Ticket Médio")
         top10 = product_summary.sort_values("avg_ticket_per_order", ascending=False).head(10)
         fig_top10 = px.bar(
             top10.sort_values("avg_ticket_per_order"),
@@ -85,7 +85,7 @@ def display_products_advanced(df_filtered: pd.DataFrame, df: pd.DataFrame):
         st.plotly_chart(fig_top10, use_container_width=True)
 
     with col2:
-        st.markdown("### 📋 Top 10 Produtos por Receita Bruta")
+        st.markdown("### Top 10 Produtos por Receita Bruta")
         top10 = product_summary.sort_values("gross_revenue", ascending=False).head(10)
         fig_top10 = px.bar(
             top10.sort_values("gross_revenue"),
@@ -114,8 +114,8 @@ def display_products_advanced(df_filtered: pd.DataFrame, df: pd.DataFrame):
     else:
         st.info("Nenhum dado de promoções encontrado para o periodo selecionado.")
 
-    st.markdown("### 📊 Distribuição por Tipo de Cartão e Motivo de Venda")
-    st.markdown("#### 🔍 Filtro: Top N Produtos por Quantidade Vendida")
+    st.markdown("### Distribuição por Tipo de Cartão e Motivo de Venda")
+    st.markdown("##### Filtro: Top N Produtos por Quantidade Vendida")
     top_n = st.slider("Selecione o número de produtos para análise:", min_value=5, max_value=30, value=10, step=1)
     tab1, tab2 = st.tabs(["🎯 Por Motivo", "💳 Por Cartão"])
 
@@ -130,7 +130,7 @@ def display_products_advanced(df_filtered: pd.DataFrame, df: pd.DataFrame):
         reason_fig = px.bar(
             df_reason,
             x="ORDER_QUANTITY", y="PRODUCT_NAME", color="SALES_REASON_NAME", orientation="h",
-            barmode="group", title="🎯 Vendas por Produto e Motivo de Venda",
+            barmode="group", title="Vendas por Produto e Motivo de Venda",
             labels={"PRODUCT_NAME": "Produto", "ORDER_QUANTITY": "Quantidade", "SALES_REASON_NAME": "Motivo de Venda"}
         )
         reason_fig.update_layout(height=600 + len(df_reason["PRODUCT_NAME"].unique()) * 30)
@@ -141,7 +141,7 @@ def display_products_advanced(df_filtered: pd.DataFrame, df: pd.DataFrame):
         card_fig = px.bar(
             df_card,
             x="ORDER_QUANTITY", y="PRODUCT_NAME", color="CARD_TYPE", orientation="h",
-            barmode="group", title="💳 Vendas por Produto e Tipo de Cartão",
+            barmode="group", title="Vendas por Produto e Tipo de Cartão",
             labels={"PRODUCT_NAME": "Produto", "ORDER_QUANTITY": "Quantidade", "CARD_TYPE": "Tipo de Cartão"}
         )
         card_fig.update_layout(height=400 + len(df_card["PRODUCT_NAME"].unique()) * 30)
