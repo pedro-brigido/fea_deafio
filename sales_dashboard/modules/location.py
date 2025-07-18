@@ -3,15 +3,15 @@ import plotly.express as px
 import pandas as pd
 from utils.data_loader import load_data
 
-def display_location_analysis(df):
+def display_location_analysis(df: pd.DataFrame):
     st.markdown("## 🌍 Desempenho Geográfico de Vendas")
     st.caption("Compreenda onde estão seus principais mercados e oportunidades de expansão.")
     st.markdown("---")
 
     # KPIs
-    by_city = df.groupby("CITY")["NET_TOTAL"].sum()
-    by_state = df.groupby("STATE_NAME")["NET_TOTAL"].sum()
-    by_country = df.groupby("COUNTRY_NAME")["NET_TOTAL"].sum()
+    by_city = df.groupby("CITY")["GROSS_TOTAL"].sum()
+    by_state = df.groupby("STATE_NAME")["GROSS_TOTAL"].sum()
+    by_country = df.groupby("COUNTRY_NAME")["GROSS_TOTAL"].sum()
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("🏙️ Cidade com Maior Receita", by_city.idxmax(), f"$ {by_city.max():,.2f}")
@@ -26,13 +26,13 @@ def display_location_analysis(df):
 
     st.subheader("🌍 Receita por Cidade no Globo")
     df_map = df.groupby([dim]).agg({
-        "NET_TOTAL": "sum",
+        "GROSS_TOTAL": "sum",
         "PK_SALES_ORDER": "nunique",
         "ORDER_QUANTITY": "sum"
     }).reset_index().rename(columns={
         "PK_SALES_ORDER": "Total Pedidos",
         "ORDER_QUANTITY": "Qtd Vendida",
-        "NET_TOTAL": "Receita"
+        "GROSS_TOTAL": "Receita"
     })
 
     # Reading geolocation
@@ -82,10 +82,10 @@ def display_location_analysis(df):
     dim = dim_map[dim_label]
 
     ticket_df = df.groupby([dim, "PRODUCT_NAME"]).agg({
-        "NET_TOTAL": "sum",
+        "GROSS_TOTAL": "sum",
         "PK_SALES_ORDER": "nunique"
     }).reset_index()
-    ticket_df["Ticket Médio"] = ticket_df["NET_TOTAL"] / ticket_df["PK_SALES_ORDER"]
+    ticket_df["Ticket Médio"] = ticket_df["GROSS_TOTAL"] / ticket_df["PK_SALES_ORDER"]
 
     top_tickets = ticket_df.sort_values("Ticket Médio", ascending=False).head(20)
     top_tickets.rename(columns={"PRODUCT_NAME": "Produto"}, inplace=True)
@@ -102,13 +102,13 @@ def display_location_analysis(df):
     st.markdown("---")
 
     df_map = df.groupby(["CITY", "STATE_NAME", "COUNTRY_NAME"]).agg({
-        "NET_TOTAL": "sum",
+        "GROSS_TOTAL": "sum",
         "PK_SALES_ORDER": "nunique",
         "ORDER_QUANTITY": "sum"
     }).reset_index().rename(columns={
         "PK_SALES_ORDER": "Total Pedidos",
         "ORDER_QUANTITY": "Qtd Vendida",
-        "NET_TOTAL": "Receita ($)"
+        "GROSS_TOTAL": "Receita ($)"
     })
     st.subheader("📍 Top 10 cidades por receita")
     top_locs = df_map.sort_values("Receita ($)", ascending=False).head(10).copy()

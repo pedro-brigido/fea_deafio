@@ -3,34 +3,29 @@ import plotly.express as px
 import pandas as pd
 from utils.data_loader import *
 
-def display_clients_advanced(df_filtered,df):
+def display_clients_advanced(df_filtered: pd.DataFrame, df: pd.DataFrame):
     st.markdown("## 🧍 Detalhamento Clientes")
     st.markdown("---")
 
     df_clients = df.copy()
-    df_clients["GROSS_TOTAL"] = df_clients["ORDER_QUANTITY"] * df_clients["UNIT_PRICE"]
-    df_clients["NET_TOTAL"] = df_clients["GROSS_TOTAL"] * (1 - df_clients["UNIT_PRICE_DISCOUNT"])
-    df_clients["LEAD_TIME_SHIPPING"] = pd.to_datetime(df_clients["SHIP_DATE"]) - pd.to_datetime(df_clients["ORDER_DATE"])
-    df_clients["ORDER_DELAYED"] = df_clients["SHIP_DATE"] > df_clients["DUE_DATE"]
-    df_clients["DISCOUNT_APPLIED"] = df_clients["UNIT_PRICE_DISCOUNT"] > 0
 
-    client_total = df_filtered.groupby("CUSTOMER_FULL_NAME")["NET_TOTAL"].sum()
+    client_total = df_filtered.groupby("CUSTOMER_FULL_NAME")["GROSS_TOTAL"].sum()
     top_10 = client_total.nlargest(10)
     top_1_name = top_10.idxmax()
     top_1_value = top_10.max()
-    top_10_pct = top_10.sum() / df_filtered["NET_TOTAL"].sum() * 100
+    top_10_pct = top_10.sum() / df_filtered["GROSS_TOTAL"].sum() * 100
     freq = df_filtered["PK_SALES_ORDER"].nunique() / df_filtered["CUSTOMER_FULL_NAME"].nunique()
     top_10_no_reset = top_10
     top_10 = top_10.reset_index()
 
     col1, col2 = st.columns([4, 2])
     with col1:
-        st.subheader("🏅 Top 10 Clientes por Receita Líquida")
+        st.subheader("🏅 Top 10 Clientes por Receita Bruta")
         fig_top_clients = px.bar(
-            top_10.sort_values("NET_TOTAL", ascending=True),
-            x="NET_TOTAL", y="CUSTOMER_FULL_NAME", orientation="h",
-            labels={"CUSTOMER_FULL_NAME": "Cliente", "NET_TOTAL": "Receita ($)"},
-            text="NET_TOTAL",
+            top_10.sort_values("GROSS_TOTAL", ascending=True),
+            x="GROSS_TOTAL", y="CUSTOMER_FULL_NAME", orientation="h",
+            labels={"CUSTOMER_FULL_NAME": "Cliente", "GROSS_TOTAL": "Receita ($)"},
+            text="GROSS_TOTAL",
         )
         fig_top_clients.update_traces(texttemplate='$ %{text:,.2f}', 
                                       textposition='inside', textfont=dict(color="black", family="Arial Black", size=13)
@@ -41,7 +36,7 @@ def display_clients_advanced(df_filtered,df):
         st.metric("🏆 Cliente com Maior Receita", top_1_name, f"$ {top_1_value:,.2f}")
         st.metric("💼 % Receita dos Top 10", f"{top_10_pct:.2f}%")
         st.metric("📅 Freq. Média de Compra", f"{freq:.2f} pedidos/cliente")
-        st.metric("📈 Receita Total (Top 10)", f"$ {top_10['NET_TOTAL'].sum():,.2f}")
+        st.metric("📈 Receita Total (Top 10)", f"$ {top_10['GROSS_TOTAL'].sum():,.2f}")
         st.metric("👥 Total de Clientes", len(df_filtered["CUSTOMER_FULL_NAME"].unique()))
 
     st.markdown("---")
@@ -52,7 +47,7 @@ def display_clients_advanced(df_filtered,df):
 
     with col1:
         st.markdown("### Distribuição por Tipo de Cartão")
-        fig_card = px.bar(df_clients.fillna({"CARD_TYPE": "Outro"}).groupby("CARD_TYPE").size().sort_values(ascending=False).reset_index(name="count"), x="CARD_TYPE", 
+        fig_card = px.bar(df_filtered.fillna({"CARD_TYPE": "Outro"}).groupby("CARD_TYPE").size().sort_values(ascending=False).reset_index(name="count"), x="CARD_TYPE", 
                           y="count",
                           labels={"CARD_TYPE": "Tipo de Cartão", "count": "Quantidade de Pedidos"},
                           text="count")
@@ -78,7 +73,7 @@ def display_clients_advanced(df_filtered,df):
     st.markdown("---")
 
     client_summary = df_clients.groupby("CUSTOMER_FULL_NAME").agg(
-        Receita=("NET_TOTAL", "sum"),
+        Receita=("GROSS_TOTAL", "sum"),
         Pedidos=("PK_SALES_ORDER", "nunique"),
         Quantidade_Comprada=("ORDER_QUANTITY", "sum"),
         Ultima_Compra=("ORDER_DATE", "max")
