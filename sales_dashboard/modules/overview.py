@@ -15,9 +15,14 @@ def display_kpis_general(df_filtered: pd.DataFrame):
     col2.metric("📦 Itens Vendidos", total_qty)
     col3.metric("💰 Receita Bruta", f"${gross:,.2f}")
     col4.metric("🎯 Ticket Médio por Pedido", f"${avg_ticket_order:,.2f}")
-    col5.metric("🚚 Tempo médio de entrega", f"{int(df_filtered['LEAD_TIME_SHIPPING'].mean())} dias", help="Dias entre pedido e entrega")
+    lead_time_mean = df_filtered["LEAD_TIME_SHIPPING"].mean()
+    lead_time_str = f"{int(lead_time_mean)} dias" if pd.notna(lead_time_mean) else "N/A"
+    col5.metric("🚚 Tempo médio de entrega", lead_time_str, help="Dias entre pedido e entrega")
 
 def display_general(df_filtered: pd.DataFrame):
+    if df_filtered.empty:
+        st.warning("Nenhum dado encontrado para os filtros aplicados.")
+        return
     st.title("📈 Visão Geral de Vendas")
     st.caption("Painel geral de performance mensal de vendas e tendências ao longo do período selecionado.")
 

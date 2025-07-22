@@ -4,6 +4,10 @@ import pandas as pd
 import textwrap
 
 def display_products_advanced(df_filtered: pd.DataFrame, df: pd.DataFrame):
+    if df_filtered.empty or df.empty:
+        st.warning("Nenhum dado encontrado para os filtros aplicados.")
+        return
+
     st.markdown("## 📦 Detalhamento de Produtos")
     st.caption("Explore o desempenho dos produtos, impacto das promoções e ticket médio por produto.")
 
