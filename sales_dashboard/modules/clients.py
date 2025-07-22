@@ -4,6 +4,9 @@ import pandas as pd
 from utils.data_loader import *
 
 def display_clients_advanced(df_filtered: pd.DataFrame, df: pd.DataFrame):
+    if df_filtered.empty or df.empty:
+        st.warning("Nenhum dado encontrado para os filtros aplicados.")
+        return
     st.markdown("## 🧍 Detalhamento Clientes")
     st.markdown("---")
 
@@ -11,10 +14,12 @@ def display_clients_advanced(df_filtered: pd.DataFrame, df: pd.DataFrame):
 
     client_total = df_filtered.groupby("CUSTOMER_FULL_NAME")["GROSS_TOTAL"].sum()
     top_10 = client_total.nlargest(10)
-    top_1_name = top_10.idxmax()
-    top_1_value = top_10.max()
-    top_10_pct = top_10.sum() / df_filtered["GROSS_TOTAL"].sum() * 100
-    freq = df_filtered["PK_SALES_ORDER"].nunique() / df_filtered["CUSTOMER_FULL_NAME"].nunique()
+    top_1_name = top_10.idxmax() if not top_10.empty else "-"
+    top_1_value = top_10.max() if not top_10.empty else 0
+    total_gross = df_filtered["GROSS_TOTAL"].sum()
+    top_10_pct = top_10.sum() / total_gross * 100 if total_gross else 0
+    n_clients = df_filtered["CUSTOMER_FULL_NAME"].nunique()
+    freq = df_filtered["PK_SALES_ORDER"].nunique() / n_clients if n_clients else 0
     top_10_no_reset = top_10
     top_10 = top_10.reset_index()
 

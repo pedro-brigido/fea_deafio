@@ -4,6 +4,9 @@ import pandas as pd
 from utils.data_loader import load_data
 
 def display_location_analysis(df: pd.DataFrame):
+    if df.empty:
+        st.warning("Nenhum dado encontrado para os filtros aplicados.")
+        return
     st.markdown("## 🌍 Desempenho Geográfico de Vendas")
     st.caption("Compreenda onde estão seus principais mercados e oportunidades de expansão.")
     st.markdown("---")
@@ -14,10 +17,17 @@ def display_location_analysis(df: pd.DataFrame):
     by_country = df.groupby("COUNTRY_NAME")["GROSS_TOTAL"].sum()
 
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("🏙️ Cidade com Maior Receita", by_city.idxmax(), f"$ {by_city.max():,.2f}")
-    col2.metric("🗽️ Estado com Maior Receita", by_state.idxmax(), f"$ {by_state.max():,.2f}")
-    col3.metric("🌐 País com Maior Receita", by_country.idxmax(), f"$ {by_country.max():,.2f}")
-    col4.metric("% Top 10 cidades vs Total", f"{by_city.nlargest(10).sum() / by_city.sum():.1%}", "Top 10 Receita % do total")
+    city_name = by_city.idxmax() if not by_city.empty else "-"
+    city_value = by_city.max() if not by_city.empty else 0
+    state_name = by_state.idxmax() if not by_state.empty else "-"
+    state_value = by_state.max() if not by_state.empty else 0
+    country_name = by_country.idxmax() if not by_country.empty else "-"
+    country_value = by_country.max() if not by_country.empty else 0
+    pct_top10 = by_city.nlargest(10).sum() / by_city.sum() if by_city.sum() else 0
+    col1.metric("🏙️ Cidade com Maior Receita", city_name, f"$ {city_value:,.2f}")
+    col2.metric("🗽️ Estado com Maior Receita", state_name, f"$ {state_value:,.2f}")
+    col3.metric("🌐 País com Maior Receita", country_name, f"$ {country_value:,.2f}")
+    col4.metric("% Top 10 cidades vs Total", f"{pct_top10:.1%}", "Top 10 Receita % do total")
 
     st.markdown("---")
     dim_map = {"Cidade": "CITY", "Estado": "STATE_NAME", "País": "COUNTRY_NAME"}
