@@ -1,85 +1,73 @@
 # FEA Desafio
 
-This repository contains a dbt project used to build an analytics
-warehouse on Snowflake as well as a Streamlit dashboard for
-visualising sales performance.  The models are based on the
-Adventure Works dataset and generate a star schema with dimensional
-and fact tables.  The `sales_dashboard` folder exposes a web
-application that queries the warehouse using Snowflake credentials
-provided via environment variables.
+Este repositório contém um projeto dbt utilizado para construir um data warehouse analítico no Snowflake, além de um dashboard Streamlit para visualizar o desempenho de vendas. Os modelos são baseados no conjunto de dados Adventure Works e geram um esquema em estrela com tabelas dimensionais e de fatos. A pasta `sales_dashboard` expõe uma aplicação web que consulta o data warehouse utilizando credenciais do Snowflake fornecidas via variáveis de ambiente.
 
-## Overview/Context
+## Visão Geral/Contexto
 
-Adventure Works (AW) is a fast‑growing bicycle manufacturer with 500+ products, 20 000 customers and 31 000 orders. To sustain this trajectory and beat the competition, AW’s leadership has launched a programme to become data‑driven by building a modern analytics platform.
+A Adventure Works (AW) é uma fabricante de bicicletas em rápido crescimento, com mais de 500 produtos, 20.000 clientes e 31.000 pedidos. Para sustentar esse ritmo e superar a concorrência, a liderança da AW lançou um programa para se tornar orientada por dados, construindo uma plataforma moderna de analytics.
 
-The initial milestone focuses on the Sales domain, but datasets from the ERP (SAP), CRM (Salesforce), Web Analytics (Google Analytics) and the Wordpress web store will soon follow. The initiative is championed by Innovation Director João Muller and backed by CEO Carlos Silveira, who demands iron‑clad data quality — for instance, 2011 gross sales must reconcile to US$ 12 646 112.16 as audited.
+O marco inicial está focado no domínio de Vendas, mas conjuntos de dados do ERP (SAP), CRM (Salesforce), Web Analytics (Google Analytics) e da loja virtual Wordpress em breve serão integrados. A iniciativa é liderada pelo Diretor de Inovação João Muller e conta com o apoio do CEO Carlos Silveira, que exige qualidade de dados impecável — por exemplo, as vendas brutas de 2011 devem reconciliar exatamente para US$ 12.646.112,16, conforme auditado.
 
-Commercial Director Silvana Teixeira questions the ROI versus promotional spend, while IT Director Nilson Ramos must deliver with limited DBA bandwidth. The project therefore prioritises quick wins, automated quality tests and clear stakeholder communication to prove value early and often. Take a look at the dimensional model built on top of ADW dataset bellow:
+A Diretora Comercial Silvana Teixeira questiona o ROI em relação aos gastos promocionais, enquanto o Diretor de TI Nilson Ramos precisa entregar resultados mesmo com uma equipe reduzida de DBAs. Por isso, o projeto prioriza quick wins, testes automatizados de qualidade e uma comunicação clara com as partes interessadas, para demonstrar valor rapidamente e de forma recorrente. Confira abaixo o modelo dimensional construído sobre o conjunto de dados ADW:
 
-![Dimensional model for Adventure Works](resources/fea_dw.png)
+![Modelo dimensional para Adventure Works](resources/fea_dw.png)
 
-## Repository structure
+## Estrutura do repositório
 
 ```
-├── models/                # dbt models (staging and marts)
-├── seeds/                 # seed files loaded into Snowflake
-├── resources/             # architecture diagram of the warehouse
-├── sales_dashboard/       # Streamlit application
-├── requirements.txt       # dependencies for dbt
-└── sales_dashboard/requirements.txt # dependencies for dash
+├── models/                # modelos dbt (staging e marts)
+├── seeds/                 # arquivos seed carregados no Snowflake
+├── resources/             # diagrama de arquitetura do data warehouse
+├── sales_dashboard/       # aplicação Streamlit
+├── requirements.txt       # dependências do dbt
+└── sales_dashboard/requirements.txt # dependências do dashboard
 ```
 
-## Requirements
+## Requisitos
 
 - Python 3.10+
-- Snowflake account with appropriate permissions
+- Conta Snowflake com permissões adequadas
 - [dbt-snowflake](https://docs.getdbt.com/reference/warehouse-setups/snowflake-profile) `1.8.3`
-- Additional packages listed in `sales_dashboard/requirements.txt`
+- Pacotes adicionais listados em `sales_dashboard/requirements.txt`
 
-## Setup
+## Configuração
 
-1. Clone this repository and create a virtual environment.
-2. Install the dbt dependencies:
+1. Clone este repositório e crie um ambiente virtual.
+2. Instale as dependências do dbt:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Install the dashboard requirements:
+3. Instale as dependências do dashboard:
 
 ```bash
 pip install -r sales_dashboard/requirements.txt
 ```
 
-4. Copy `.env.example` to `.env` and fill in your Snowflake
-   credentials or configure them directly as environment variables.
-5. Ensure the profile in `profiles.yml` matches your Snowflake
-   connection information.
+4. Copie o `.env.example` para `.env` e preencha com suas credenciais do Snowflake, ou configure-as diretamente como variáveis de ambiente.
+5. Garanta que o perfil em `profiles.yml` corresponda às informações da sua conexão Snowflake.
 
-## Running dbt
+## Executando o dbt
 
-With the environment variables set, execute the following command to
-build the warehouse:
+Com as variáveis de ambiente configuradas, execute o seguinte comando para construir o data warehouse:
 
 ```bash
-dbt build # test and build all models
+dbt build # testa e constrói todos os modelos
 ```
 
-The generated schemas will be created under the database and schema
-configured in your profile.
+Os esquemas gerados serão criados no banco de dados e schema definidos em seu perfil.
 
-## Running the dashboard
+## Executando o dashboard
 
-After building the models you can launch the Streamlit dashboard:
+Após construir os modelos, você pode iniciar o dashboard Streamlit:
 
 ```bash
 streamlit run sales_dashboard/main.py
 ```
 
-The application queries the Snowflake warehouse using the same
-credentials defined in your `.env` file or Streamlit `secrets.toml`.
+A aplicação consulta o data warehouse Snowflake usando as mesmas credenciais definidas no seu arquivo `.env` ou no `secrets.toml` do Streamlit.
 
-## License
+## Licença
 
-This project is provided for educational purposes.  See the source for
-full details.
+Este projeto é disponibilizado para fins educacionais. Consulte o código-fonte para mais detalhes.
